@@ -1,0 +1,190 @@
+import { MainNeed, RecordSubject } from '../types';
+
+export interface MemorySuggestionItem {
+  id: string;
+  label: string;
+  prompt: string;
+}
+
+export interface TagDetailItem {
+  tag: string;
+  question: string;
+  placeholder: string;
+  isRequired?: boolean;
+}
+
+export interface StageOptionItem {
+  value: number;
+  label: string;
+}
+
+export interface TranslationDictionary {
+  app: {
+    name: string;
+    tagline: string;
+    subtitle: string;
+  };
+  nav: {
+    today: string;
+    ask: string;
+    journey: string;
+    care: string;
+  };
+  header: {
+    changePhaseTitle: string;
+    changePhaseAria: string;
+  };
+  onboarding: {
+    welcomeBadge: string;
+    stageBadge: string;
+    focusBadge: string;
+    step1Title: string;
+    step1Subtitle: string;
+    phasePregnancyTitle: string;
+    phasePregnancyDesc: string;
+    phaseBabyTitle: string;
+    phaseBabyDesc: string;
+    step2Title: string;
+    step2Subtitle: string;
+    pregnancyStages: StageOptionItem[];
+    babyStages: StageOptionItem[];
+    step3Title: string;
+    step3Subtitle: string;
+    needs: Record<MainNeed, { title: string; subtitle: string }>;
+    nextBtn: string;
+    backBtn: string;
+    startBtn: string;
+  };
+  today: {
+    badge: string;
+    greetingPregnancy: string;
+    greetingBaby: string;
+    phasePrefix: string;
+    focusPrefix: string;
+    checkinBadge: string;
+    changeAnswerBtn: string;
+    skipCheckinBtn: string;
+    rhythmTitle: string;
+    rhythmSubtitle: string;
+    rhythmMom: string;
+    rhythmBaby: string;
+    rhythmActivities: string;
+    rhythmEmpty: string;
+    guideTitle: string;
+    guideSubtitle: string;
+    viewAllCareBtn: string;
+    verifiedBadge: string;
+    demonstrativeBadge: string;
+    activityCompletedToast: string;
+    doActivityBtn: string;
+    alreadyDoneBadge: string;
+    completeModalTitle: string;
+    completeModalDesc: string;
+    completeModalPlaceholder: string;
+    completeModalSaveBtn: string;
+    completeModalCancelBtn: string;
+  };
+  care: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    catAll: string;
+    catMom: string;
+    catDevelopment: string;
+    catFeeding: string;
+    catMonitoring: string;
+    doActivityBtn: string;
+    activityDoneBadge: string;
+    sourceLabel: string;
+    modalTitle: string;
+    modalDesc: string;
+    modalPlaceholder: string;
+    modalConfirmBtn: string;
+    modalCancelBtn: string;
+  };
+  journey: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    clearSearchBtn: string;
+    allFilter: string;
+    babyFilter: string;
+    momFilter: string;
+    memoryFilter: string;
+    countSingle: string;
+    countPlural: string;
+    monthOf: string; // ex: "de" in "Outubro de 2026", " " in "October 2026"
+    prevMonthAria: string;
+    nextMonthAria: string;
+    emptyMonthTitle: string;
+    emptyMonthSubtitle: string;
+    emptySearchTitle: string;
+    emptySearchSubtitle: string;
+    newRecordBtn: string;
+    closeBtn: string;
+    exportMenuBtn: string;
+    newRecordTitle: string;
+    dateSectionTitle: string;
+    dateToday: string;
+    dateYesterday: string;
+    dateOther: string;
+    subjectSectionTitle: string;
+    subjectOptions: Record<RecordSubject, string>;
+    babyPromptTitle: string;
+    momPromptTitle: string;
+    memoryPromptTitle: string;
+    optionsSubtitle: string;
+    memorySuggestionsSubtitle: string;
+    memorySuggestions: MemorySuggestionItem[];
+    babyTags: TagDetailItem[];
+    momTags: TagDetailItem[];
+    noteLabel: string;
+    noteGeneralPlaceholder: string;
+    saveRecordBtn: string;
+    savingRecordBtn: string;
+    savedSuccessMsg: string;
+    validationChooseOption: string;
+    validationDescribeBriefly: (tagName: string) => string;
+    exportModalTitle: string;
+    exportModalDesc: string;
+    exportJsonTitle: string;
+    exportJsonDesc: string;
+    exportTxtTitle: string;
+    exportTxtDesc: string;
+    clearAllDataBtn: string;
+    clearModalTitle: string;
+    clearModalQuestion: string;
+    clearModalWarning: string;
+    clearModalCancelBtn: string;
+    clearModalConfirmBtn: string;
+    months: string[];
+    dateTodayPrefix: string;
+    dateYesterdayPrefix: string;
+  };
+  ask: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    disclaimerTitle: string;
+    disclaimerText: string;
+    commonQuestionsTitle: string;
+    sampleQuestionsPregnancy: string[];
+    sampleQuestionsBaby: string[];
+    inputTitle: string;
+    inputPlaceholder: string;
+    sourcesNotice: string;
+    consultBtn: string;
+    statusNoticeTitle: string;
+    statusNoticeDesc: string;
+    alertComingSoon: string;
+  };
+  common: {
+    loading: string;
+    dbErrorTitle: string;
+    dbErrorDesc: string;
+    saveError: string;
+    clearError: string;
+    confirmPhaseReset: string;
+  };
+}

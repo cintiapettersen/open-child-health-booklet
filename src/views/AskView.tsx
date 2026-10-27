@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
+import { useLanguage } from '../context/LanguageContext';
+import { getLocalizedStageLabel } from '../locales';
 import { Send, ShieldAlert, BookOpen, Sparkles } from 'lucide-react';
 
 interface AskViewProps {
@@ -7,29 +9,26 @@ interface AskViewProps {
 }
 
 export const AskView: React.FC<AskViewProps> = ({ profile }) => {
+  const { language, t } = useLanguage();
   const [question, setQuestion] = useState('');
 
-  const sampleQuestions = profile.phase === 'pregnancy' ? [
-    'É normal sentir sono excessivo no primeiro trimestre?',
-    'Quais alimentos evitar durante a gestação?',
-    'Como identificar os primeiros sinais do trabalho de parto?'
-  ] : [
-    'Bebê de 2 meses soluçando muito após mamar é perigoso?',
-    'Como sei se a pega da amamentação está correta?',
-    'Quantas horas de sono são esperadas nessa idade?'
-  ];
+  const sampleQuestions = profile.phase === 'pregnancy'
+    ? t.ask.sampleQuestionsPregnancy
+    : t.ask.sampleQuestionsBaby;
+
+  const localizedStage = getLocalizedStageLabel(profile, language);
 
   return (
     <div className="content-area">
       <div style={{ marginBottom: '16px' }}>
         <span className="tag-badge tag-sage" style={{ marginBottom: '6px' }}>
-          Assistente Educativo
+          {t.ask.badge}
         </span>
         <h1 style={{ fontSize: '1.45rem', fontWeight: 700, color: 'var(--text-main)' }}>
-          Tire suas dúvidas
+          {t.ask.title}
         </h1>
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-          Respostas fundamentadas em guias oficiais de saúde (OMS e Ministério da Saúde).
+          {t.ask.subtitle}
         </p>
       </div>
 
@@ -48,14 +47,14 @@ export const AskView: React.FC<AskViewProps> = ({ profile }) => {
       >
         <ShieldAlert size={18} color="#C76B50" style={{ flexShrink: 0, marginTop: '2px' }} />
         <div style={{ fontSize: '0.8rem', color: '#6A5647', lineHeight: 1.4 }}>
-          <strong>Aviso de Saúde:</strong> Este assistente tem finalidade exclusivamente educativa e informativa. Ele não substitui consultas presenciais, diagnósticos ou condutas médicas.
+          <strong>{t.ask.disclaimerTitle}</strong> {t.ask.disclaimerText}
         </div>
       </div>
 
       {/* Sugestões de Perguntas Rápidas */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
-          Dúvidas comuns para {profile.stageLabel}:
+          {t.ask.commonQuestionsTitle} ({localizedStage})
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {sampleQuestions.map((q, idx) => (
@@ -82,12 +81,12 @@ export const AskView: React.FC<AskViewProps> = ({ profile }) => {
       {/* Caixa de Entrada */}
       <div className="card" style={{ padding: '16px' }}>
         <div style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>
-          Sua pergunta:
+          {t.ask.inputTitle}
         </div>
         <textarea
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ex: Como lidar com cólicas no bebê de 2 meses?"
+          placeholder={t.ask.inputPlaceholder}
           rows={3}
           style={{
             width: '100%',
@@ -105,16 +104,16 @@ export const AskView: React.FC<AskViewProps> = ({ profile }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: 'var(--text-soft)' }}>
             <BookOpen size={14} />
-            <span>Fontes: MS / OMS</span>
+            <span>{t.ask.sourcesNotice}</span>
           </div>
           <button
             className="btn btn-primary"
             style={{ width: 'auto', padding: '10px 18px', minHeight: '42px', fontSize: '0.88rem' }}
             onClick={() => {
-              alert('Estrutura de interface pronta! A conexão com o Edge Gateway e RAG com citação de fontes será ativada na Etapa 4.');
+              alert(t.ask.alertComingSoon);
             }}
           >
-            <span>Consultar</span>
+            <span>{t.ask.consultBtn}</span>
             <Send size={14} />
           </button>
         </div>
@@ -122,8 +121,7 @@ export const AskView: React.FC<AskViewProps> = ({ profile }) => {
 
       {/* Nota da Etapa de Implementação */}
       <div style={{ textAlign: 'center', padding: '16px', color: 'var(--text-soft)', fontSize: '0.78rem' }}>
-        🔌 <strong>Etapa 1 (Concluída):</strong> Interface e contratos de dados prontos.<br />
-        Aguardando <strong>Etapa 4</strong> para conexão com o RAG real via Edge Gateway.
+        🔌 <strong>{t.ask.statusNoticeTitle}</strong> {t.ask.statusNoticeDesc}
       </div>
     </div>
   );

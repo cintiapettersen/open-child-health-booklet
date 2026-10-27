@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { UserProfile, JourneyRecord, RecordSubject } from '../types';
 import { indexedDbService } from '../services/indexedDbService';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Baby,
   Heart,
@@ -36,18 +37,6 @@ interface MemorySuggestion {
   prompt: string;
 }
 
-interface TagDetailConfig {
-  tag: string;
-  question: string;
-  placeholder: string;
-  isRequired?: boolean;
-}
-
-const MONTH_NAMES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-];
-
 export const JourneyView: React.FC<JourneyViewProps> = ({
   profile,
   records,
@@ -55,6 +44,8 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
   onClearRecords,
   storageError
 }) => {
+  const { language, t } = useLanguage();
+
   const [isFormOpen, setIsFormOpen] = useState(true);
   const [subject, setSubject] = useState<RecordSubject>('baby');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -80,103 +71,12 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
 
   const subjectOptions: { id: RecordSubject; label: string; icon: React.ReactNode }[] = [
-    { id: 'baby', label: 'Bebê', icon: <Baby size={18} /> },
-    { id: 'mom', label: 'Mãe', icon: <Heart size={18} /> },
-    { id: 'memory', label: 'Memória', icon: <Camera size={18} /> }
+    { id: 'baby', label: t.journey.subjectOptions.baby, icon: <Baby size={18} /> },
+    { id: 'mom', label: t.journey.subjectOptions.mom, icon: <Heart size={18} /> },
+    { id: 'memory', label: t.journey.subjectOptions.memory, icon: <Camera size={18} /> }
   ];
 
-  const babyTagsConfig: TagDetailConfig[] = [
-    {
-      tag: 'Dormiu bem',
-      question: 'Como foram as sonecas ou o sono da noite?',
-      placeholder: 'Ex: Conseguiu dormir 2h direto sem despertar assustado...'
-    },
-    {
-      tag: 'Mamou ou se alimentou normalmente',
-      question: 'Observou algo especial na mamada ou refeição?',
-      placeholder: 'Ex: Mamou com calma e sem engasgos...'
-    },
-    {
-      tag: 'Estava mais irritado',
-      question: 'Percebeu algum motivo provável para a irritação?',
-      placeholder: 'Ex: Parecia incomodado com cólica ou salto de desenvolvimento...'
-    },
-    {
-      tag: 'Teve alguma descoberta ou marco',
-      question: 'Que gesto, som ou novidade você reparou?',
-      placeholder: 'Ex: Tentou segurar o brinquedo com as duas mãozinhas...'
-    },
-    {
-      tag: 'Apresentou algum sintoma',
-      question: 'Qual sintoma você notou com atenção?',
-      placeholder: 'Ex: Febre baixa após vacina, nariz com secreção transparente...',
-      isRequired: true
-    }
-  ];
-
-  const momTagsConfig: TagDetailConfig[] = [
-    {
-      tag: 'Tive uma conquista pessoal hoje',
-      question: 'Qual vitória sua merece ser celebrada?',
-      placeholder: 'Ex: Consegui almoçar sentada e com calma...'
-    },
-    {
-      tag: 'Enfrentei uma dificuldade importante',
-      question: 'O que tornou o dia difícil para você?',
-      placeholder: 'Ex: Me senti muito sobrecarregada com as demandas...',
-      isRequired: true
-    },
-    {
-      tag: 'Consegui um tempo só para mim',
-      question: 'O que você pôde fazer nesse momento seu?',
-      placeholder: 'Ex: Tomei um banho relaxante de 20 minutos...'
-    },
-    {
-      tag: 'Tive uma conversa ou troca significativa',
-      question: 'Com quem foi e o que fez bem para você?',
-      placeholder: 'Ex: Conversei com uma amiga que também tem bebê...'
-    },
-    {
-      tag: 'Recebi apoio prático que fez a diferença',
-      question: 'Qual ajuda recebida aliviou o seu dia?',
-      placeholder: 'Ex: Minha mãe trouxe o almoço pronto...'
-    },
-    {
-      tag: 'Observação sobre meu corpo ou recuperação',
-      question: 'Como seu corpo tem respondido aos cuidados?',
-      placeholder: 'Ex: Sinto menos dores nas costas hoje...'
-    }
-  ];
-
-  const memorySuggestions: MemorySuggestion[] = [
-    {
-      id: 'first_achievement',
-      label: 'Primeira conquista',
-      prompt: 'O que seu bebê fez pela primeira vez?'
-    },
-    {
-      id: 'special_moment',
-      label: 'Momento especial',
-      prompt: 'O que tornou esse momento especial hoje?'
-    },
-    {
-      id: 'outing',
-      label: 'Passeio',
-      prompt: 'Onde vocês foram e o que descobriram juntos?'
-    },
-    {
-      id: 'sounds_laughter',
-      label: 'Som ou risada',
-      prompt: 'Qual balbucio, som novo ou risada chamou sua atenção?'
-    },
-    {
-      id: 'sweet_gesture',
-      label: 'Gesto de carinho',
-      prompt: 'Que abraço, olhar ou conexão aqueceu seu coração?'
-    }
-  ];
-
-  const currentTagsConfig = subject === 'baby' ? babyTagsConfig : momTagsConfig;
+  const currentTagsConfig = subject === 'baby' ? t.journey.babyTags : t.journey.momTags;
   const activeDetailConfig = currentTagsConfig
     .slice()
     .reverse()
@@ -194,39 +94,46 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
       const now = new Date();
       return {
         isoDate: todayISO,
-        label: `Hoje, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+        label: `${t.journey.dateTodayPrefix}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
       };
     } else if (eventDateType === 'yesterday') {
       const y = new Date();
       y.setDate(y.getDate() - 1);
+      const yesterdayISO = y.toISOString().split('T')[0];
       return {
-        isoDate: y.toISOString().split('T')[0],
-        label: 'Ontem'
+        isoDate: yesterdayISO,
+        label: t.journey.dateYesterdayPrefix
       };
     } else {
       const parts = customEventDate.split('-');
+      let formattedLabel = customEventDate;
       if (parts.length === 3) {
-        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        return {
-          isoDate: customEventDate,
-          label: `${d.getDate()} de ${MONTH_NAMES[d.getMonth()]}`
-        };
+        formattedLabel = `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
-      return { isoDate: todayISO, label: 'Data anterior' };
+      return {
+        isoDate: customEventDate,
+        label: formattedLabel
+      };
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
     setValidationError(null);
 
+    // Validação suave
     if (subject === 'memory') {
-      if (!note.trim() && !selectedMemoryPrompt) {
-        setValidationError('Por favor, escreva uma breve memória ou selecione uma ideia.');
+      if (!note || note.trim().length === 0) {
+        setValidationError(
+          language === 'en'
+            ? 'Please write a brief note to preserve this memory.'
+            : 'Por favor, escreva um breve relato para guardar essa memória.'
+        );
         return;
       }
     } else {
-      if (selectedTags.length === 0 && !note.trim()) {
-        setValidationError('Selecione pelo menos uma opção rápida ou conte o que aconteceu.');
+      if (selectedTags.length === 0 && (!note || note.trim().length === 0)) {
+        setValidationError(t.journey.validationChooseOption);
         return;
       }
 
@@ -236,7 +143,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
 
       if (requiresDescription && (!note || note.trim().length < 3)) {
         setValidationError(
-          `Para acontecimentos como "${activeDetailConfig?.tag}", escreva ao menos uma breve descrição para contextualizar.`
+          t.journey.validationDescribeBriefly(activeDetailConfig?.tag || '')
         );
         return;
       }
@@ -245,7 +152,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
     const { isoDate, label: dateLabel } = calculateTargetDate();
 
     const tagsToSave = subject === 'memory'
-      ? (selectedMemoryPrompt ? [selectedMemoryPrompt.label] : ['Memória Afetiva'])
+      ? (selectedMemoryPrompt ? [selectedMemoryPrompt.label] : [language === 'en' ? 'Affective Memory' : 'Memória Afetiva'])
       : selectedTags;
 
     const newRecord: JourneyRecord = {
@@ -320,6 +227,8 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
     return today.getFullYear() === selectedYear && today.getMonth() === selectedMonth;
   })();
 
+  const monthCountLabel = filteredRecords.length === 1 ? t.journey.countSingle : t.journey.countPlural;
+
   return (
     <div className="content-area">
       {/* Aviso de erro se IndexedDB falhar */}
@@ -338,47 +247,76 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
         >
           <AlertCircle size={18} color="#C76B50" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '0.82rem', color: '#7A2E2E', lineHeight: 1.4 }}>
-            <strong>Armazenamento Local Restrito:</strong> {storageError}. Em respeito à sua privacidade, nenhum dado é enviado para servidores externos.
+            <strong>{t.common.dbErrorTitle}:</strong> {storageError}. {t.common.dbErrorDesc}
           </div>
         </div>
       )}
 
-      {/* Cabeçalho com Botões de Ação */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
+      {/* Cabeçalho da Seção com Botão de Exportação */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
         <div>
-          <span className="tag-badge tag-primary" style={{ marginBottom: '6px' }}>
-            Jornada • {profile.stageLabel}
+          <span className="tag-badge tag-warm" style={{ marginBottom: '6px' }}>
+            {t.journey.badge}
           </span>
-          <h1 style={{ fontSize: '1.45rem', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>
-            Registrar um momento ♡
+          <h1 style={{ fontSize: '1.45rem', fontWeight: 600, color: 'var(--text-main)' }}>
+            {t.journey.title}
           </h1>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+            {t.journey.subtitle}
+          </p>
         </div>
 
-        {/* Botão de Exportação & Opções */}
         <button
           onClick={() => setIsExportMenuOpen(true)}
-          title="Backup e Opções dos Registros"
           className="btn btn-secondary"
-          style={{ width: 'auto', minHeight: '38px', padding: '6px 12px', fontSize: '0.8rem', gap: '4px' }}
+          title={t.journey.exportMenuBtn}
+          aria-label={t.journey.exportMenuBtn}
+          style={{
+            width: 'auto',
+            padding: '8px 12px',
+            minHeight: '38px',
+            fontSize: '0.82rem',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            flexShrink: 0
+          }}
         >
-          <Download size={14} />
-          <span>Exportar</span>
+          <Download size={15} />
+          <span>{language === 'en' ? 'Backup' : 'Exportar'}</span>
         </button>
       </div>
 
-      <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-        Anotações salvas no banco do seu dispositivo com persistência local IndexedDB.
-      </p>
+      {/* Botão para Abrir/Fechar Formulário de Novo Registro */}
+      <div style={{ marginBottom: '16px' }}>
+        <button
+          onClick={() => {
+            setIsFormOpen(!isFormOpen);
+            setValidationError(null);
+          }}
+          className="btn btn-primary"
+          style={{ justifyContent: 'center', gap: '8px' }}
+        >
+          {isFormOpen ? <X size={18} /> : <Plus size={18} />}
+          <span>{isFormOpen ? t.journey.closeBtn : t.journey.newRecordBtn}</span>
+        </button>
+      </div>
 
-      {/* Formulário Interativo de Registro */}
-      {isFormOpen ? (
-        <div className="card" style={{ padding: '18px', border: '1.5px solid var(--border-light)' }}>
-          {/* Seletor de Data do Acontecimento */}
-          <div style={{ marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid var(--border-light)' }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
-              Quando aconteceu?
+      {/* FORMULÁRIO DE NOVO REGISTRO */}
+      {isFormOpen && (
+        <form onSubmit={handleSave} className="card" style={{ border: '2px solid var(--primary-light)', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '12px' }}>
+            {t.journey.newRecordTitle}
+          </h2>
+
+          {/* 1. QUANDO ACONTECEU? (Seletor de Datas Anteriores) */}
+          <div style={{ marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
+            <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
+              {t.journey.dateSectionTitle}
             </div>
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
               <button
                 type="button"
                 onClick={() => setEventDateType('today')}
@@ -391,7 +329,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   backgroundColor: eventDateType === 'today' ? 'var(--primary-light)' : '#FFFFFF'
                 }}
               >
-                Hoje
+                {t.journey.dateToday}
               </button>
               <button
                 type="button"
@@ -405,7 +343,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   backgroundColor: eventDateType === 'yesterday' ? 'var(--primary-light)' : '#FFFFFF'
                 }}
               >
-                Ontem
+                {t.journey.dateYesterday}
               </button>
               <button
                 type="button"
@@ -419,7 +357,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   backgroundColor: eventDateType === 'custom' ? 'var(--primary-light)' : '#FFFFFF'
                 }}
               >
-                Outra data...
+                {t.journey.dateOther}
               </button>
 
               {eventDateType === 'custom' && (
@@ -441,7 +379,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
           </div>
 
           <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '10px' }}>
-            Sobre quem vamos registrar?
+            {t.journey.subjectSectionTitle}
           </div>
 
           {/* Seletor de 3 Colunas: Bebê / Mãe / Memória */}
@@ -468,49 +406,47 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
           {(subject === 'baby' || subject === 'mom') && (
             <div style={{ marginTop: '12px' }}>
               <div style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-main)', fontFamily: 'var(--font-title)' }}>
-                {subject === 'baby' ? 'Como foi o dia do bebê?' : 'O que aconteceu na sua jornada hoje?'}
+                {subject === 'baby' ? t.journey.babyPromptTitle : t.journey.momPromptTitle}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px', marginBottom: '8px' }}>
-                Escolha uma ou mais opções e conte um pouco mais.
+                {t.journey.optionsSubtitle}
               </div>
 
               <div className="quick-tags-list">
                 {currentTagsConfig.map((item) => {
                   const isSelected = selectedTags.includes(item.tag);
                   return (
-                    <div
+                    <button
                       key={item.tag}
+                      type="button"
                       onClick={() => handleToggleTag(item.tag)}
-                      className={`quick-tag-item ${isSelected ? 'selected' : ''}`}
-                      role="checkbox"
-                      aria-checked={isSelected}
+                      className={`quick-tag-chip ${isSelected ? 'selected' : ''}`}
                     >
-                      <div className="checkbox-circle">
-                        {isSelected && <Check size={13} strokeWidth={3} />}
-                      </div>
-                      <span className="quick-tag-label">{item.tag}</span>
-                    </div>
+                      {isSelected && <Check size={13} style={{ marginRight: '4px' }} />}
+                      <span>{item.tag}</span>
+                      {item.isRequired && (
+                        <span style={{ fontSize: '0.72rem', color: '#B23B3B', marginLeft: '3px' }}>*</span>
+                      )}
+                    </button>
                   );
                 })}
               </div>
 
+              {/* Pergunta inspiradora de apoio se uma opção estiver marcada */}
               {activeDetailConfig && (
                 <div
                   style={{
-                    backgroundColor: 'var(--bg-card-muted)',
-                    borderLeft: '3px solid var(--primary)',
+                    backgroundColor: 'var(--primary-light)',
+                    borderRadius: 'var(--radius-sm)',
                     padding: '10px 12px',
-                    borderRadius: '4px',
+                    marginTop: '12px',
                     marginBottom: '10px',
-                    fontSize: '0.85rem',
-                    color: 'var(--text-main)'
+                    borderLeft: '3px solid var(--primary)'
                   }}
                 >
-                  <div style={{ fontWeight: 600, color: 'var(--primary)', marginBottom: '2px' }}>
-                    {activeDetailConfig.question}
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    {activeDetailConfig.isRequired ? 'Por favor, escreva uma breve descrição abaixo.' : 'Relate em poucas palavras se desejar.'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--primary)' }}>
+                    <Lightbulb size={14} />
+                    <span>{activeDetailConfig.question}</span>
                   </div>
                 </div>
               )}
@@ -521,27 +457,27 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
           {subject === 'memory' && (
             <div style={{ marginTop: '12px' }}>
               <div style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-main)', fontFamily: 'var(--font-title)' }}>
-                Sugestões de lembrança para guardar
+                {t.journey.memoryPromptTitle}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px', marginBottom: '8px' }}>
-                Toque em uma ideia para inspirar sua escrita, ou conte livremente.
+                {t.journey.memorySuggestionsSubtitle}
               </div>
 
-              <div className="memory-suggestions-grid">
-                {memorySuggestions.map((item) => {
-                  const isSelected = selectedMemoryPrompt?.id === item.id;
+              <div className="quick-tags-list">
+                {t.journey.memorySuggestions.map((sug) => {
+                  const isSelected = selectedMemoryPrompt?.id === sug.id;
                   return (
                     <button
-                      key={item.id}
+                      key={sug.id}
                       type="button"
                       onClick={() => {
-                        setSelectedMemoryPrompt(isSelected ? null : item);
+                        setSelectedMemoryPrompt(isSelected ? null : sug);
                         setValidationError(null);
                       }}
-                      className={`memory-pill ${isSelected ? 'active' : ''}`}
+                      className={`quick-tag-chip ${isSelected ? 'selected' : ''}`}
                     >
-                      <Sparkles size={13} color={isSelected ? '#7A531C' : 'var(--warm-gold)'} />
-                      <span>{item.label}</span>
+                      {isSelected && <Check size={13} style={{ marginRight: '4px' }} />}
+                      <span>{sug.label}</span>
                     </button>
                   );
                 })}
@@ -551,35 +487,31 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 <div
                   style={{
                     backgroundColor: 'var(--warm-gold-light)',
-                    border: '1px solid #F3DFC1',
                     borderRadius: 'var(--radius-sm)',
                     padding: '10px 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '10px'
+                    marginTop: '12px',
+                    marginBottom: '10px',
+                    borderLeft: '3px solid var(--warm-gold)'
                   }}
                 >
-                  <Lightbulb size={16} color="var(--warm-gold)" style={{ flexShrink: 0 }} />
-                  <div style={{ fontSize: '0.85rem', color: '#6A4A1C', fontWeight: 600 }}>
-                    "{selectedMemoryPrompt.prompt}"
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#65481E' }}>
+                    <Sparkles size={14} />
+                    <span>{selectedMemoryPrompt.prompt}</span>
                   </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Campo de Escrita Livre */}
+          {/* Campo de Texto para Contexto / Relato */}
           <div style={{ marginTop: '12px' }}>
             <label
               htmlFor="journey-note"
-              style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}
+              style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}
             >
               {subject === 'memory'
-                ? (selectedMemoryPrompt ? 'Escreva sobre esse momento:' : 'Sua anotação da memória:')
-                : activeDetailConfig
-                  ? activeDetailConfig.question
-                  : 'Quer acrescentar algo? (opcional)'}
+                ? (language === 'en' ? 'Describe this moment:' : 'Descreva esse momento:')
+                : (activeDetailConfig ? (language === 'en' ? 'Add context (optional or brief):' : 'Adicione contexto (opcional ou breve):') : t.journey.noteLabel)}
             </label>
             <textarea
               id="journey-note"
@@ -589,99 +521,108 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 setValidationError(null);
               }}
               placeholder={
-                subject === 'memory'
-                  ? (selectedMemoryPrompt ? selectedMemoryPrompt.prompt : 'Conte do seu jeito...')
-                  : (activeDetailConfig ? activeDetailConfig.placeholder : 'Conte do seu jeito...')
+                activeDetailConfig
+                  ? activeDetailConfig.placeholder
+                  : selectedMemoryPrompt
+                  ? selectedMemoryPrompt.prompt
+                  : t.journey.noteGeneralPlaceholder
               }
-              rows={subject === 'memory' ? 3 : 2}
+              rows={3}
               style={{
                 width: '100%',
-                padding: '12px',
+                padding: '10px 12px',
                 borderRadius: 'var(--radius-sm)',
-                border: validationError ? '1.5px solid #D9534F' : '1.5px solid var(--border-light)',
-                fontSize: '0.9rem',
+                border: '1.5px solid var(--border-light)',
+                fontSize: '0.88rem',
                 fontFamily: 'inherit',
                 resize: 'none',
-                outline: 'none',
-                backgroundColor: '#FAF7F2'
+                outline: 'none'
               }}
             />
           </div>
 
+          {/* Mensagem de Erro / Orientação Suave */}
           {validationError && (
             <div
               style={{
+                backgroundColor: '#FFF2F2',
+                border: '1px solid #F5C2C2',
+                borderRadius: 'var(--radius-sm)',
+                padding: '8px 10px',
+                fontSize: '0.8rem',
+                color: '#B23B3B',
                 marginTop: '10px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                color: '#C76B50',
-                fontSize: '0.82rem',
-                fontWeight: 600
+                gap: '6px'
               }}
             >
-              <AlertCircle size={15} />
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
               <span>{validationError}</span>
             </div>
           )}
 
-          <div style={{ marginTop: '16px' }}>
+          {/* Ações do Formulário */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
             <button
-              onClick={handleSave}
-              className="btn btn-primary"
-              style={{
-                backgroundColor: saveSuccess ? 'var(--sage)' : 'var(--primary)',
-                transition: 'background-color 0.2s ease'
+              type="button"
+              onClick={() => {
+                setIsFormOpen(false);
+                setSelectedTags([]);
+                setSelectedMemoryPrompt(null);
+                setNote('');
+                setValidationError(null);
               }}
+              className="btn btn-secondary"
+              style={{ width: 'auto', minHeight: '38px', padding: '8px 14px', fontSize: '0.84rem' }}
+            >
+              {t.journey.closeBtn}
+            </button>
+            <button
+              type="submit"
+              disabled={saveSuccess}
+              className="btn btn-primary"
+              style={{ width: 'auto', minHeight: '38px', padding: '8px 18px', fontSize: '0.84rem' }}
             >
               {saveSuccess ? (
                 <>
-                  <Check size={18} />
-                  <span>Momento registrado no IndexedDB!</span>
+                  <Check size={16} />
+                  <span>{t.journey.savedSuccessMsg}</span>
                 </>
               ) : (
-                <>
-                  <Plus size={18} />
-                  <span>Salvar momento na linha do tempo</span>
-                </>
+                <span>{t.journey.saveRecordBtn}</span>
               )}
             </button>
           </div>
-        </div>
-      ) : (
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="btn btn-secondary"
-          style={{ marginBottom: '20px', gap: '8px' }}
-        >
-          <Plus size={18} color="var(--primary)" />
-          <span>Fazer novo registro</span>
-        </button>
+        </form>
       )}
 
-      {/* FILTROS E BUSCA NA LINHA DO TEMPO */}
-      <div style={{ marginTop: '20px', marginBottom: '14px' }}>
-        {/* Barra de Busca Textual */}
-        <div style={{ position: 'relative', marginBottom: '10px' }}>
-          <Search size={16} color="var(--text-soft)" style={{ position: 'absolute', left: '12px', top: '12px' }} />
+      {/* BARRA DE FILTROS E BUSCA NA LINHA DO TEMPO */}
+      <div style={{ marginBottom: '14px' }}>
+        {/* Campo de Busca Textual */}
+        <div style={{ position: 'relative', marginBottom: '8px' }}>
+          <Search size={15} color="var(--text-soft)" style={{ position: 'absolute', left: '12px', top: '12px' }} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por palavra nas anotações (ex: sono, vacina)..."
+            placeholder={t.journey.searchPlaceholder}
             style={{
               width: '100%',
-              padding: '10px 12px 10px 36px',
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid var(--border-light)',
-              fontSize: '0.85rem',
-              outline: 'none',
-              backgroundColor: '#FFFFFF'
+              padding: '9px 34px 9px 34px',
+              borderRadius: 'var(--radius-full)',
+              border: '1px solid var(--border-light)',
+              fontSize: '0.84rem',
+              backgroundColor: '#FFFFFF',
+              fontFamily: 'inherit',
+              outline: 'none'
             }}
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
+              title={t.journey.clearSearchBtn}
+              aria-label={t.journey.clearSearchBtn}
               style={{
                 position: 'absolute',
                 right: '12px',
@@ -700,10 +641,10 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
         {/* Filtros em Pílulas: Todos | Bebê | Mãe | Memória */}
         <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
           {[
-            { id: 'all', label: 'Todos' },
-            { id: 'baby', label: '👶 Bebê' },
-            { id: 'mom', label: '♡ Mãe' },
-            { id: 'memory', label: '📷 Memórias' }
+            { id: 'all', label: t.journey.allFilter },
+            { id: 'baby', label: t.journey.babyFilter },
+            { id: 'mom', label: t.journey.momFilter },
+            { id: 'memory', label: t.journey.memoryFilter }
           ].map((f) => {
             const isSelected = activeFilterSubject === f.id;
             return (
@@ -736,26 +677,26 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
           <button
             onClick={handlePrevMonth}
             className="month-nav-btn"
-            title="Mês anterior"
-            aria-label="Ver mês anterior"
+            title={t.journey.prevMonthAria}
+            aria-label={t.journey.prevMonthAria}
           >
             <ChevronLeft size={20} />
           </button>
 
           <div className="month-title-wrap">
             <div className="month-title">
-              {MONTH_NAMES[selectedMonth]} de {selectedYear}
+              {t.journey.months[selectedMonth]} {t.journey.monthOf} {selectedYear}
             </div>
             <div className="month-count-badge">
-              {filteredRecords.length} {filteredRecords.length === 1 ? 'momento exibido' : 'momentos exibidos'}
+              {filteredRecords.length} {monthCountLabel}
             </div>
           </div>
 
           <button
             onClick={handleNextMonth}
             className="month-nav-btn"
-            title="Próximo mês"
-            aria-label="Ver próximo mês"
+            title={t.journey.nextMonthAria}
+            aria-label={t.journey.nextMonthAria}
           >
             <ChevronRight size={20} />
           </button>
@@ -778,7 +719,11 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
               }}
             >
               <Calendar size={13} />
-              <span>Voltar para o mês atual ({MONTH_NAMES[new Date().getMonth()]})</span>
+              <span>
+                {language === 'en'
+                  ? `Back to current month (${t.journey.months[new Date().getMonth()]})`
+                  : `Voltar para o mês atual (${t.journey.months[new Date().getMonth()]})`}
+              </span>
             </button>
           </div>
         )}
@@ -794,11 +739,11 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span className={`tag-badge ${isBaby ? 'tag-primary' : isMom ? 'tag-sage' : 'tag-warm'}`}>
-                        {isBaby ? '👶 Bebê' : isMom ? '♡ Mãe' : '📷 Memória'}
+                        {isBaby ? t.journey.babyFilter : isMom ? t.journey.momFilter : t.journey.memoryFilter}
                       </span>
                       {rec.sourceActivityTitle && (
                         <span className="tag-badge tag-warm" style={{ fontSize: '0.7rem' }}>
-                          <Sparkles size={11} /> Cuidado Praticado
+                          <Sparkles size={11} /> {language === 'en' ? 'Practiced Care' : 'Cuidado Praticado'}
                         </span>
                       )}
                     </div>
@@ -809,7 +754,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
 
                   {rec.tags.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: rec.note ? '8px' : '0' }}>
-                      {rec.tags.map((t, idx) => (
+                      {rec.tags.map((tg, idx) => (
                         <span
                           key={idx}
                           style={{
@@ -821,7 +766,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                             fontWeight: 500
                           }}
                         >
-                          ✓ {t}
+                          ✓ {tg}
                         </span>
                       ))}
                     </div>
@@ -835,7 +780,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
 
                   {rec.sourceActivityTitle && (
                     <div style={{ marginTop: '8px', fontSize: '0.78rem', color: 'var(--sage)', fontStyle: 'italic' }}>
-                      Atividade vinculada: "{rec.sourceActivityTitle}"
+                      {language === 'en' ? 'Linked activity:' : 'Atividade vinculada:'} "{rec.sourceActivityTitle}"
                     </div>
                   )}
                 </div>
@@ -868,10 +813,12 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
               <Calendar size={18} />
             </div>
             <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)', marginBottom: '4px' }}>
-              Nenhum momento encontrado
+              {searchQuery ? t.journey.emptySearchTitle : t.journey.emptyMonthTitle}
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '280px', margin: '0 auto 16px auto', lineHeight: 1.4 }}>
-              {searchQuery ? 'Tente buscar por outro termo ou limpar o filtro.' : `Nenhum momento registrado em ${MONTH_NAMES[selectedMonth]}.`}
+              {searchQuery
+                ? t.journey.emptySearchSubtitle
+                : `${t.journey.emptyMonthSubtitle} (${t.journey.months[selectedMonth]}).`}
             </p>
             {searchQuery && (
               <button
@@ -879,7 +826,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 className="btn btn-secondary"
                 style={{ width: 'auto', padding: '6px 14px', minHeight: '36px', fontSize: '0.8rem' }}
               >
-                Limpar busca
+                {t.journey.clearSearchBtn}
               </button>
             )}
           </div>
@@ -914,7 +861,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '1.15rem', margin: 0 }}>Soberania dos seus dados</h3>
+              <h3 style={{ fontSize: '1.15rem', margin: 0 }}>{t.journey.exportModalTitle}</h3>
               <button
                 onClick={() => setIsExportMenuOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
@@ -924,7 +871,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
             </div>
 
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: '16px' }}>
-              Seus registros estão guardados localmente no seu aparelho. Você pode exportá-los a qualquer momento em formato aberto.
+              {t.journey.exportModalDesc}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -938,14 +885,14 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
               >
                 <Download size={16} color="var(--primary)" />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 600 }}>Baixar Backup (.JSON)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Arquivo completo para restauração futura</div>
+                  <div style={{ fontWeight: 600 }}>{t.journey.exportJsonTitle}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.journey.exportJsonDesc}</div>
                 </div>
               </button>
 
               <button
                 onClick={() => {
-                  indexedDbService.exportAsTextSummary(records, profile);
+                  indexedDbService.exportAsTextSummary(records, profile, language);
                   setIsExportMenuOpen(false);
                 }}
                 className="btn btn-secondary"
@@ -953,8 +900,8 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
               >
                 <FileText size={16} color="var(--sage)" />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 600 }}>Baixar Resumo (.TXT)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Texto legível para levar à consulta médica</div>
+                  <div style={{ fontWeight: 600 }}>{t.journey.exportTxtTitle}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.journey.exportTxtDesc}</div>
                 </div>
               </button>
 
@@ -977,7 +924,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   }}
                 >
                   <Trash2 size={14} />
-                  <span>Apagar todos os registros deste aparelho...</span>
+                  <span>{t.journey.clearAllDataBtn}</span>
                 </button>
               </div>
             </div>
@@ -985,7 +932,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
         </div>
       )}
 
-      {/* MODAL 2: CONFIRMAÇÃO EXPLÍCITA DE EXCLUSÃO (CUIDADO 2) */}
+      {/* MODAL 2: CONFIRMAÇÃO EXPLÍCITA DE EXCLUSÃO */}
       {isConfirmClearOpen && (
         <div
           style={{
@@ -1014,11 +961,11 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#B23B3B', marginBottom: '10px' }}>
               <AlertTriangle size={22} />
-              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Confirmação de Exclusão</h3>
+              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t.journey.clearModalTitle}</h3>
             </div>
 
             <p style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45, marginBottom: '14px' }}>
-              Tem certeza de que deseja apagar todos os registros do IndexedDB deste aparelho?
+              {t.journey.clearModalQuestion}
             </p>
 
             <div
@@ -1033,7 +980,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 lineHeight: 1.4
               }}
             >
-              <strong>Atenção:</strong> Como os dados ficam salvos apenas no seu dispositivo, essa exclusão é <strong>irreversível</strong> se você não tiver feito um backup em JSON antes.
+              {t.journey.clearModalWarning}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -1042,7 +989,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 className="btn btn-secondary"
                 style={{ flex: 1, minHeight: '40px', fontSize: '0.85rem' }}
               >
-                Cancelar
+                {t.journey.clearModalCancelBtn}
               </button>
               <button
                 onClick={() => {
@@ -1057,7 +1004,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                   fontSize: '0.85rem'
                 }}
               >
-                Sim, apagar tudo
+                {t.journey.clearModalConfirmBtn}
               </button>
             </div>
           </div>

@@ -1,6 +1,6 @@
-import { ContentItem, UserProfile, CheckInMood } from '../types';
-import { CONTENTS_CATALOG } from '../data/contents';
-import { CHECKIN_QUESTIONS } from '../data/checkins';
+import { ContentItem, UserProfile, CheckInMood, SupportedLanguage } from '../types';
+import { getContentCatalog } from '../data/contents';
+import { getCheckinQuestions } from '../data/checkins';
 
 const VIEWED_STORAGE_KEY = 'p1000_viewed_content_ids_v1';
 
@@ -33,8 +33,9 @@ export const ruleEngine = {
   },
 
   // Seleciona a pergunta de check-in do dia (rotativa conforme o dia da semana ou fase)
-  getDailyCheckIn(profile: UserProfile, dayOffset = 0) {
-    const applicable = CHECKIN_QUESTIONS.filter(
+  getDailyCheckIn(profile: UserProfile, dayOffset = 0, lang: SupportedLanguage = 'pt-BR') {
+    const questions = getCheckinQuestions(lang);
+    const applicable = questions.filter(
       (q) => q.phase === 'both' || q.phase === profile.phase
     );
     const dayIndex = (new Date().getDay() + dayOffset) % applicable.length;
@@ -44,12 +45,14 @@ export const ruleEngine = {
   // Seleciona as 3 orientações do dia combinando fase, prioridade, check-in e histórico
   getRecommendations(
     profile: UserProfile,
-    currentMood?: CheckInMood
+    currentMood?: CheckInMood,
+    lang: SupportedLanguage = 'pt-BR'
   ): DailyRecommendations {
     const viewedIds = this.getViewedIds();
+    const catalog = getContentCatalog(lang);
 
     // 1. Filtra catálogo pela fase da usuária (pregnancy vs baby)
-    const phaseCatalog = CONTENTS_CATALOG.filter((c) => {
+    const phaseCatalog = catalog.filter((c) => {
       if (c.phase !== 'both' && c.phase !== profile.phase) return false;
       if (profile.phase === 'baby') {
         const min = c.minStageMonths ?? 0;
@@ -62,7 +65,7 @@ export const ruleEngine = {
     // Função auxiliar com ponderação por frescor (não vistos recentemente têm prioridade)
     const pickBest = (candidates: ContentItem[]): ContentItem => {
       if (candidates.length === 0) {
-        return CONTENTS_CATALOG[0];
+        return catalog[0];
       }
       // Prioriza itens não vistos recentemente
       const unviewed = candidates.filter((c) => !viewedIds.includes(c.id));
@@ -86,15 +89,15 @@ export const ruleEngine = {
     // Se a mãe relatou cansaço ou dificuldade no check-in, prioriza conteúdos de descanso e autocompaixão
     if (currentMood === 'tired' || currentMood === 'struggling') {
       const restOriented = momCandidates.filter(
-        (c) => c.theme.includes('Descanso') || c.theme.includes('Saúde Emocional') || c.id === 'mom-rest-fragmented'
+        (c) => c.id === 'mom-rest-fragmented' || c.id === 'mom-self-compassion'
       );
       if (restOriented.length > 0) {
         momCandidates = restOriented;
       }
     } else if (currentMood === 'good') {
-      // Se relatou boa disposição, pode sugerir movimento suave ou conexão ativa
+      // Se relatou boa disposição, pode sugerir movimento suave ou nutrição
       const activeOriented = momCandidates.filter(
-        (c) => c.theme.includes('Postura') || c.theme.includes('Nutrição')
+        (c) => c.id === 'mom-gentle-movement' || c.id === 'mom-hydration-energy'
       );
       if (activeOriented.length > 0) {
         momCandidates = activeOriented;

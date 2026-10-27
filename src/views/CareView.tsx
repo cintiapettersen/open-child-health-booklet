@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { UserProfile, JourneyRecord, ActiveTab, ContentItem } from '../types';
-import { CONTENTS_CATALOG } from '../data/contents';
+import { getContentCatalog } from '../data/contents';
 import { journeyStorage } from '../services/journeyStorage';
+import { useLanguage } from '../context/LanguageContext';
+import { getLocalizedStageLabel } from '../locales';
 import { Baby, Flower2, Milk, Sparkles, BookOpen, Check, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface CareViewProps {
@@ -11,20 +13,24 @@ interface CareViewProps {
 }
 
 export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavigate }) => {
+  const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activityNote, setActivityNote] = useState<string>('');
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
 
   const categories = [
-    { id: 'all', label: 'Tudo' },
-    { id: 'wellbeing', label: 'Mãe & Bem-estar', icon: Flower2 },
-    { id: 'development', label: 'Bebê & Estímulos', icon: Baby },
-    { id: 'feeding', label: 'Nutrição & Amamentação', icon: Milk },
-    { id: 'baby_care', label: 'Acompanhamento', icon: Sparkles }
+    { id: 'all', label: t.care.catAll },
+    { id: 'wellbeing', label: t.care.catMom, icon: Flower2 },
+    { id: 'development', label: t.care.catDevelopment, icon: Baby },
+    { id: 'feeding', label: t.care.catFeeding, icon: Milk },
+    { id: 'baby_care', label: t.care.catMonitoring, icon: Sparkles }
   ];
 
+  // Catálogo no idioma ativo
+  const catalog = getContentCatalog(language);
+
   // Filtra catálogo pela fase da usuária
-  const phaseArticles = CONTENTS_CATALOG.filter((item) => {
+  const phaseArticles = catalog.filter((item) => {
     if (item.phase !== 'both' && item.phase !== profile.phase) return false;
     if (profile.phase === 'baby') {
       const min = item.minStageMonths ?? 0;
@@ -46,13 +52,17 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
   const handleConfirmActivity = (art: ContentItem) => {
     const todayStr = new Date().toISOString().split('T')[0];
     const now = new Date();
-    const timeLabel = `Hoje, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const timeLabel = `${t.journey.dateTodayPrefix}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const defaultNote = language === 'en'
+      ? `Practiced care guidance: "${art.title}"`
+      : `Pratiquei a orientação de cuidados: "${art.title}"`;
 
     const newRecord: JourneyRecord = {
       id: `rec-care-${Date.now()}`,
       subject: art.audience === 'mom' ? 'mom' : 'baby',
       tags: [art.tagLabel || art.title],
-      note: activityNote.trim() || `Pratiquei a orientação de cuidados: "${art.title}"`,
+      note: activityNote.trim() || defaultNote,
       sourceActivityTitle: art.title,
       contentId: art.id,
       timestamp: now.toISOString(),
@@ -65,17 +75,21 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
     setActivityNote('');
   };
 
+  const localizedStage = getLocalizedStageLabel(profile, language);
+
   return (
     <div className="content-area">
       <div style={{ marginBottom: '18px' }}>
         <span className="tag-badge tag-warm" style={{ marginBottom: '6px' }}>
-          Biblioteca de Cuidados
+          {t.care.badge}
         </span>
         <h1 style={{ fontSize: '1.45rem', fontWeight: 600, color: 'var(--text-main)' }}>
-          Orientações Práticas
+          {t.care.title}
         </h1>
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-          Ações recomendadas para {profile.stageLabel}. Ao concluir, você pode salvá-las na sua Jornada.
+          {language === 'en'
+            ? `Recommended actions for ${localizedStage}. Once completed, you can log them to your Journey.`
+            : `Ações recomendadas para ${localizedStage}. Ao concluir, você pode salvá-las na sua Jornada.`}
         </p>
       </div>
 
@@ -119,7 +133,7 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                   {art.categoryLabel}
                 </span>
                 <span style={{ fontSize: '0.72rem', color: 'var(--text-soft)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                  <ShieldCheck size={12} color="var(--sage)" /> Fonte Oficial
+                  <ShieldCheck size={12} color="var(--sage)" /> {language === 'en' ? 'Official Guideline' : 'Fonte Oficial'}
                 </span>
               </div>
 
@@ -143,7 +157,7 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                     marginBottom: '12px'
                   }}
                 >
-                  <strong>Prática recomendada:</strong> {art.practicalAction}
+                  <strong>{language === 'en' ? 'Recommended practice:' : 'Prática recomendada:'}</strong> {art.practicalAction}
                 </div>
               )}
 
@@ -176,17 +190,17 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                           }}
                         >
                           <Check size={14} />
-                          <span>Fiz essa atividade hoje</span>
+                          <span>{t.care.doActivityBtn}</span>
                         </button>
                       ) : (
                         <div style={{ backgroundColor: '#FAF7F2', padding: '12px', borderRadius: 'var(--radius-sm)' }}>
                           <div style={{ fontSize: '0.82rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-main)' }}>
-                            Quer adicionar uma observação? (opcional)
+                            {t.care.modalDesc}
                           </div>
                           <textarea
                             value={activityNote}
                             onChange={(e) => setActivityNote(e.target.value)}
-                            placeholder="Como foi a experiência? O bebê curtiu?"
+                            placeholder={t.care.modalPlaceholder}
                             rows={2}
                             style={{
                               width: '100%',
@@ -210,14 +224,14 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                                 cursor: 'pointer'
                               }}
                             >
-                              Cancelar
+                              {t.care.modalCancelBtn}
                             </button>
                             <button
                               onClick={() => handleConfirmActivity(art)}
                               className="btn btn-primary"
                               style={{ width: 'auto', minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem' }}
                             >
-                              Confirmar na Jornada
+                              {t.care.modalConfirmBtn}
                             </button>
                           </div>
                         </div>
@@ -225,7 +239,7 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                     ) : (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '0.78rem', color: 'var(--sage)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <Check size={14} /> Atividade já registrada na Jornada hoje!
+                          <Check size={14} /> {t.care.activityDoneBadge}
                         </span>
                         <button
                           onClick={() => onNavigate('journey')}
@@ -241,7 +255,7 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                             gap: '2px'
                           }}
                         >
-                          Ver na Jornada <ArrowRight size={12} />
+                          {language === 'en' ? 'View in Journey' : 'Ver na Jornada'} <ArrowRight size={12} />
                         </button>
                       </div>
                     )}

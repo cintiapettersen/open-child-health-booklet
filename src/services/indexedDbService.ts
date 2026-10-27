@@ -1,4 +1,4 @@
-import { JourneyRecord, UserProfile } from '../types';
+import { JourneyRecord, UserProfile, SupportedLanguage } from '../types';
 
 const DB_NAME = 'first_1000_days_db';
 const DB_VERSION = 1;
@@ -194,35 +194,53 @@ class IndexedDbService {
   }
 
   // Exportação em resumo de texto legível (para levar ao pediatra ou consulta médica)
-  public exportAsTextSummary(records: JourneyRecord[], profile: UserProfile): void {
-    let summary = `RELATÓRIO DE ACOMPANHAMENTO - PRIMEIROS 1.000 DIAS\n`;
-    summary += `Data de Exportação: ${new Date().toLocaleDateString('pt-BR')}\n`;
-    summary += `Fase Atual: ${profile.stageLabel}\n`;
-    summary += `Total de Registros: ${records.length}\n`;
+  public exportAsTextSummary(
+    records: JourneyRecord[],
+    profile: UserProfile,
+    lang: SupportedLanguage = 'pt-BR'
+  ): void {
+    const isEn = lang === 'en';
+    let summary = isEn
+      ? `MONITORING SUMMARY - FIRST 1,000 DAYS\n`
+      : `RELATÓRIO DE ACOMPANHAMENTO - PRIMEIROS 1.000 DIAS\n`;
+    summary += `${isEn ? 'Export Date' : 'Data de Exportação'}: ${new Date().toLocaleDateString(isEn ? 'en-US' : 'pt-BR')}\n`;
+    summary += `${isEn ? 'Current Stage' : 'Fase Atual'}: ${profile.stageLabel}\n`;
+    summary += `${isEn ? 'Total Records' : 'Total de Registros'}: ${records.length}\n`;
     summary += `------------------------------------------------------------\n\n`;
 
     records.forEach((rec, idx) => {
-      const subjectLabel = rec.subject === 'baby' ? 'BEBÊ' : rec.subject === 'mom' ? 'MÃE' : 'MEMÓRIA';
-      summary += `[${idx + 1}] Data: ${rec.dateLabel} (${rec.eventDate}) | Tipo: ${subjectLabel}\n`;
+      let subjectLabel = '';
+      if (isEn) {
+        subjectLabel = rec.subject === 'baby' ? 'BABY' : rec.subject === 'mom' ? 'MOTHER' : 'MEMORY';
+      } else {
+        subjectLabel = rec.subject === 'baby' ? 'BEBÊ' : rec.subject === 'mom' ? 'MÃE' : 'MEMÓRIA';
+      }
+
+      summary += `[${idx + 1}] ${isEn ? 'Date' : 'Data'}: ${rec.dateLabel} (${rec.eventDate}) | ${isEn ? 'Type' : 'Tipo'}: ${subjectLabel}\n`;
       if (rec.tags && rec.tags.length > 0) {
-        summary += `    Marcações: ${rec.tags.join(', ')}\n`;
+        summary += `    ${isEn ? 'Tags' : 'Marcações'}: ${rec.tags.join(', ')}\n`;
       }
       if (rec.note) {
-        summary += `    Anotação: "${rec.note}"\n`;
+        summary += `    ${isEn ? 'Note' : 'Anotação'}: "${rec.note}"\n`;
       }
       if (rec.sourceActivityTitle) {
-        summary += `    Atividade Praticada: ${rec.sourceActivityTitle}\n`;
+        summary += `    ${isEn ? 'Practiced Care' : 'Atividade Praticada'}: ${rec.sourceActivityTitle}\n`;
       }
       summary += `\n`;
     });
 
-    summary += `\n* Documento gerado localmente pelo aplicativo Primeiros 1.000 Dias.\n`;
-    summary += `* Não constitui prontuário médico oficial. Uso informativo para suporte às consultas de puericultura.\n`;
+    summary += isEn
+      ? `\n* Document generated locally by the First 1,000 Days application.\n* Not an official medical record. For informational support during pediatric and clinical visits.\n`
+      : `\n* Documento gerado localmente pelo aplicativo Primeiros 1.000 Dias.\n* Não constitui prontuário médico oficial. Uso informativo para suporte às consultas de puericultura.\n`;
+
+    const filename = isEn
+      ? `pediatric_summary_${getTodayISODate()}.txt`
+      : `resumo_puericultura_${getTodayISODate()}.txt`;
 
     const dataStr = 'data:text/plain;charset=utf-8,' + encodeURIComponent(summary);
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `resumo_puericultura_${getTodayISODate()}.txt`);
+    downloadAnchor.setAttribute('download', filename);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();

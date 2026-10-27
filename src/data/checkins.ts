@@ -1,6 +1,6 @@
-import { CheckInQuestion } from '../types';
+import { CheckInQuestion, SupportedLanguage } from '../types';
 
-export const CHECKIN_QUESTIONS: CheckInQuestion[] = [
+export const CHECKIN_QUESTIONS_PT: CheckInQuestion[] = [
   {
     id: 'checkin-sleep',
     phase: 'both',
@@ -98,3 +98,109 @@ export const CHECKIN_QUESTIONS: CheckInQuestion[] = [
     ]
   }
 ];
+
+export const CHECKIN_QUESTIONS_EN: CheckInQuestion[] = [
+  {
+    id: 'checkin-sleep',
+    phase: 'both',
+    question: 'How was your night?',
+    subtitle: 'A quick 5-second pause just to check in with yourself.',
+    options: [
+      {
+        id: 'sleep-well',
+        label: 'Rested well',
+        feedback: 'What a relief when the night allows you to recharge! Enjoy this calm energy.',
+        mood: 'good'
+      },
+      {
+        id: 'sleep-ok',
+        label: 'So-so',
+        feedback: 'Days with fragmented sleep call for a gentle pace. Do not hesitate to delegate chores today.',
+        mood: 'neutral'
+      },
+      {
+        id: 'sleep-hard',
+        label: 'It was hard',
+        feedback: 'We are with you. Sleep deprivation affects body and mind. Prioritize only what is essential today.',
+        mood: 'tired'
+      },
+      {
+        id: 'sleep-none',
+        label: 'Barely slept',
+        feedback: 'A warm hug to you. Today the top priority is you and baby; everything else can wait.',
+        mood: 'struggling'
+      }
+    ]
+  },
+  {
+    id: 'checkin-energy',
+    phase: 'both',
+    question: 'How is your energy level right now?',
+    subtitle: 'Noticing your body helps calibrate the pace of your day.',
+    options: [
+      {
+        id: 'energy-high',
+        label: 'Good energy',
+        feedback: 'Wonderful! A great time for gentle play or a brief moment of self-care.',
+        mood: 'good'
+      },
+      {
+        id: 'energy-medium',
+        label: 'Managing ok',
+        feedback: 'Take things at your own pace, taking mindful breathers throughout the day.',
+        mood: 'neutral'
+      },
+      {
+        id: 'energy-low',
+        label: 'Quite tired',
+        feedback: 'Your body is asking to slow down. Allow yourself to do only the bare minimum today.',
+        mood: 'tired'
+      },
+      {
+        id: 'energy-drained',
+        label: 'Exhausted',
+        feedback: 'Acknowledging exhaustion is the first step toward asking for help or resting. Take a deep breath.',
+        mood: 'struggling'
+      }
+    ]
+  },
+  {
+    id: 'checkin-connection',
+    phase: 'baby',
+    question: 'How are your moments together with baby today?',
+    subtitle: 'No expectations: each day has its own rhythm and tune.',
+    options: [
+      {
+        id: 'conn-sweet',
+        label: 'Sweet and gentle',
+        feedback: 'These peaceful exchanges strengthen bonding and nourish both your hearts.',
+        mood: 'good'
+      },
+      {
+        id: 'conn-busy',
+        label: 'Hectic and on autopilot',
+        feedback: 'Completely normal in daily caregiving. Small seconds of warm touch truly count.',
+        mood: 'neutral'
+      },
+      {
+        id: 'conn-tense',
+        label: 'More challenging today',
+        feedback: 'Babies have difficult days too and sense fatigue around them. This too will pass.',
+        mood: 'tired'
+      },
+      {
+        id: 'conn-overwhelmed',
+        label: 'I need a breather',
+        feedback: 'Wanting to step away for 5 quiet minutes is a healthy sign of self-awareness. Ask for a hand.',
+        mood: 'struggling'
+      }
+    ]
+  }
+];
+
+export const getCheckinQuestions = (lang: SupportedLanguage = 'pt-BR'): CheckInQuestion[] => {
+  return lang === 'en' ? CHECKIN_QUESTIONS_EN : CHECKIN_QUESTIONS_PT;
+};
+
+// Export padrão retrocompatível
+export const CHECKIN_QUESTIONS = CHECKIN_QUESTIONS_PT;

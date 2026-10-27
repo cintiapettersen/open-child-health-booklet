@@ -1,6 +1,6 @@
-import { ContentItem } from '../types';
+import { ContentItem, SupportedLanguage } from '../types';
 
-export const CONTENTS_CATALOG: ContentItem[] = [
+export const CONTENTS_CATALOG_PT: ContentItem[] = [
   // --- MÃE & BEM-ESTAR ---
   {
     id: 'mom-rest-fragmented',
@@ -185,3 +185,196 @@ export const CONTENTS_CATALOG: ContentItem[] = [
     validationStatus: 'verified'
   }
 ];
+
+export const CONTENTS_CATALOG_EN: ContentItem[] = [
+  // --- MOTHER & WELLBEING ---
+  {
+    id: 'mom-rest-fragmented',
+    title: 'The importance of fragmented maternal rest',
+    category: 'wellbeing',
+    categoryLabel: 'Maternal Wellbeing',
+    audience: 'mom',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 6,
+    theme: 'Rest and Recovery',
+    educationalText: 'Sleep during the early postpartum period is naturally fragmented by the newborn\'s biological rhythm. Resting in 30- to 90-minute blocks when the baby sleeps helps regulate cortisol levels and stabilize mood.',
+    practicalAction: 'Take a 20-minute break with your eyes closed and feet elevated, even without falling into deep sleep.',
+    tagLabel: 'Intentional pause to rest',
+    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition, p. 38)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'mom-self-compassion',
+    title: 'Self-compassion on days of intense fatigue',
+    category: 'wellbeing',
+    categoryLabel: 'Maternal Wellbeing',
+    audience: 'mom',
+    phase: 'both',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Emotional Health',
+    educationalText: 'Feeling overwhelmed on days with heavy care demands is an understandable human response. Lowering expectations regarding household chores is an essential preventive mental health measure.',
+    practicalAction: 'Choose one secondary household task today and consciously decide to postpone it.',
+    tagLabel: 'Reduced pressure and prioritized rest',
+    source: 'Perinatal Mental Health Guidelines / WHO (2022)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'mom-hydration-energy',
+    title: 'Hydration and energy replenishment',
+    category: 'mom_care',
+    categoryLabel: 'Maternal Care',
+    audience: 'mom',
+    phase: 'both',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Nutrition and Vitality',
+    educationalText: 'Breast milk production and maternal physical recovery require increased fluid intake. Mild dehydration frequently manifests as fatigue, headaches, and irritability.',
+    practicalAction: 'Keep a glass or bottle of fresh water always within reach during feeding or resting sessions.',
+    tagLabel: 'Mindful hydration throughout the day',
+    source: 'Dietary Guidelines for the Brazilian Population / Ministry of Health (Brazil)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'mom-gentle-movement',
+    title: 'Gentle stretching for shoulders and back',
+    category: 'mom_care',
+    categoryLabel: 'Maternal Care',
+    audience: 'mom',
+    phase: 'baby',
+    minStageMonths: 1,
+    maxStageMonths: 24,
+    theme: 'Posture and Physical Relief',
+    educationalText: 'Feeding, rocking, and carrying a baby puts heavy demands on neck and upper back muscles. Small circular shoulder rolls help release tension accumulated throughout the day.',
+    practicalAction: 'Gently roll your shoulders backward 10 times and take a deep breath, releasing the air through your mouth.',
+    tagLabel: 'Muscle stretching and tension relief',
+    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition)',
+    validationStatus: 'verified'
+  },
+
+  // --- BABY & DEVELOPMENT ---
+  {
+    id: 'baby-visual-contrast',
+    title: 'Visual stimulation: contours and faces at 25 cm',
+    category: 'development',
+    categoryLabel: 'Stimulation & Development',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 3,
+    theme: 'Vision and Interaction',
+    educationalText: 'During the first three months, an infant\'s visual acuity focuses sharply at distances of 20 to 30 centimeters (8-12 inches) — precisely the distance between the caregiver\'s face and the baby\'s eyes during feeding.',
+    practicalAction: 'Gently bring your face to about 25 cm (10 inches), use calm facial expressions, and speak in a melodic tone.',
+    tagLabel: 'Close eye contact and gentle voice',
+    source: 'Child Health Record Handbook / Ministry of Health (Brazil) (2023 Edition, p. 44)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'baby-tummy-time-gentle',
+    title: 'Gentle chest-supported tummy time',
+    category: 'development',
+    categoryLabel: 'Stimulation & Development',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 1,
+    maxStageMonths: 6,
+    theme: 'Motor Development',
+    educationalText: 'Placing an awake baby on their tummy, always under close supervision and for short intervals, strengthens neck, back, and shoulder muscles required for rolling and sitting.',
+    practicalAction: 'Lie back comfortably and place the baby tummy-down on your own chest for 2 to 3 minutes.',
+    tagLabel: 'Tummy time on chest',
+    source: 'Brazilian Society of Pediatrics (SBP) / Child Development Department',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'baby-social-smile',
+    title: 'The emergence of the social smile',
+    category: 'development',
+    categoryLabel: 'Stimulation & Development',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 2,
+    maxStageMonths: 4,
+    theme: 'Socioemotional Milestones',
+    educationalText: 'Around the second month, smiling transitions from an involuntary reflex to an intentional response to caregivers\' voices and affection, marking the beginning of active social communication.',
+    practicalAction: 'Smile and wait a few seconds for the baby\'s response, giving them time to process the interaction.',
+    tagLabel: 'Social smile exchange',
+    source: 'Child Health Record Handbook / Ministry of Health (Brazil) (2023 Edition, 2nd Month Milestones)',
+    validationStatus: 'verified'
+  },
+
+  // --- BREASTFEEDING & NUTRITION ---
+  {
+    id: 'feed-hunger-cues',
+    title: 'Early hunger cues: before crying begins',
+    category: 'feeding',
+    categoryLabel: 'Feeding & Nutrition',
+    audience: 'both',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 6,
+    theme: 'Responsive Feeding',
+    educationalText: 'Turning the head side-to-side rooting for the breast, licking lips, and bringing hands to the mouth are early hunger cues. Crying is a late sign of hunger-induced distress.',
+    practicalAction: 'Watch your baby\'s hands and mouth upon waking, and offer the breast or feed before crying starts.',
+    tagLabel: 'Responding to early hunger cues',
+    source: 'Dietary Guidelines for Brazilian Children Under 2 Years (MS/PAHO)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'feed-latch-comfort',
+    title: 'Comfortable, pain-free latch',
+    category: 'feeding',
+    categoryLabel: 'Breastfeeding',
+    audience: 'both',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 3,
+    theme: 'Comfortable Breastfeeding',
+    educationalText: 'Breastfeeding should not be painful. A proper latch covers a large portion of the lower areola, with a wide-open mouth ("flanged fish lips") and chin resting against the breast for effective, pain-free suction.',
+    practicalAction: 'Position the baby tummy-to-tummy and wait for a wide-open mouth before bringing baby gently to the breast.',
+    tagLabel: 'Tummy-to-tummy latch adjustment',
+    source: 'Child Health Record Handbook / Ministry of Health (Brazil) (2023 Edition, Lactation Management)',
+    validationStatus: 'verified'
+  },
+
+  // --- PREGNANCY ---
+  {
+    id: 'preg-movement-awareness',
+    title: 'Noticing fetal movements',
+    category: 'baby_care',
+    categoryLabel: 'Pregnancy Monitoring',
+    audience: 'both',
+    phase: 'pregnancy',
+    minStageMonths: 0,
+    maxStageMonths: 42,
+    theme: 'Bonding and Connection',
+    educationalText: 'From the middle of pregnancy onward, fetal movements become noticeable and reflect baby\'s vitality. Resting comfortably after meals helps heighten awareness of these movements.',
+    practicalAction: 'Sit comfortably after dinner, place both hands on your belly, and quietly observe movements for 10 minutes.',
+    tagLabel: 'Quiet moment observing baby movements',
+    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition)',
+    validationStatus: 'verified'
+  },
+  {
+    id: 'preg-pelvic-breathing',
+    title: 'Diaphragmatic breathing and pelvic relief',
+    category: 'wellbeing',
+    categoryLabel: 'Maternal Wellbeing',
+    audience: 'mom',
+    phase: 'pregnancy',
+    minStageMonths: 0,
+    maxStageMonths: 42,
+    theme: 'Pregnancy Comfort',
+    educationalText: 'Deep, mindful breathing supports placental oxygenation and relaxes pelvic floor muscles, alleviating lower back discomfort common in the second and third trimesters.',
+    practicalAction: 'Inhale through your nose expanding your ribs for 4 seconds, and gently exhale through your mouth for 6 seconds.',
+    tagLabel: 'Deep breathing for pelvic relaxation',
+    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition)',
+    validationStatus: 'verified'
+  }
+];
+
+export const getContentCatalog = (lang: SupportedLanguage = 'pt-BR'): ContentItem[] => {
+  return lang === 'en' ? CONTENTS_CATALOG_EN : CONTENTS_CATALOG_PT;
+};
+
+// Export padrão retrocompatível
+export const CONTENTS_CATALOG = CONTENTS_CATALOG_PT;

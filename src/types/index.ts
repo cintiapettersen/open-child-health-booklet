@@ -7,11 +7,14 @@ export type MainNeed =
   | 'development'
   | 'all';
 
+export type SupportedLanguage = 'pt-BR' | 'en';
+
 export interface UserProfile {
   phase: UserPhase;
   stageValue: number;
   stageLabel: string;
   mainNeed: MainNeed;
+  preferredLanguage?: SupportedLanguage;
   displayName?: string;
   createdAt: string;
   updatedAt: string;

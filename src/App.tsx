@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, ActiveTab, JourneyRecord } from './types';
 import { profileStorage } from './services/profileStorage';
 import { indexedDbService } from './services/indexedDbService';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { Onboarding } from './views/Onboarding';
@@ -10,7 +11,8 @@ import { AskView } from './views/AskView';
 import { JourneyView } from './views/JourneyView';
 import { CareView } from './views/CareView';
 
-export const App: React.FC = () => {
+const MainApp: React.FC = () => {
+  const { language, setLanguage, t } = useLanguage();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>('today');
   const [loading, setLoading] = useState<boolean>(true);
@@ -22,6 +24,9 @@ export const App: React.FC = () => {
     const saved = profileStorage.getProfile();
     if (saved) {
       setProfile(saved);
+      if (saved.preferredLanguage && saved.preferredLanguage !== language) {
+        setLanguage(saved.preferredLanguage);
+      }
     }
 
     // 2. Carrega registros de saúde e memórias estruturados do IndexedDB nativo
@@ -42,13 +47,14 @@ export const App: React.FC = () => {
   }, []);
 
   const handleCompleteOnboarding = (newProfile: UserProfile) => {
+    newProfile.preferredLanguage = language;
     profileStorage.saveProfile(newProfile);
     setProfile(newProfile);
     setActiveTab('today');
   };
 
   const handleResetProfile = () => {
-    if (window.confirm('Deseja alterar a fase ou reiniciar a introdução rápida?')) {
+    if (window.confirm(t.common.confirmPhaseReset)) {
       profileStorage.clearProfile();
       setProfile(null);
     }
@@ -60,7 +66,7 @@ export const App: React.FC = () => {
       setRecords(updated);
     } catch (err) {
       console.error('Falha ao salvar registro no IndexedDB:', err);
-      alert('Não foi possível gravar no armazenamento do aparelho.');
+      alert(t.common.saveError);
     }
   };
 
@@ -70,14 +76,14 @@ export const App: React.FC = () => {
       setRecords([]);
     } catch (err) {
       console.error('Erro ao limpar IndexedDB:', err);
-      alert('Erro ao apagar registros locais.');
+      alert(t.common.clearError);
     }
   };
 
   if (loading) {
     return (
       <div className="app-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Carregando dados locais...</div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t.common.loading}</div>
       </div>
     );
   }
@@ -120,6 +126,14 @@ export const App: React.FC = () => {
         </>
       )}
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <LanguageProvider>
+      <MainApp />
+    </LanguageProvider>
   );
 };
 
