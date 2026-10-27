@@ -1,0 +1,11 @@
+Open Child Health Booklet / Primeiros 1.000 Dias
+Copyright 2026 Cintia Pettersen
+
+This product includes software developed as part of the Open Child Health Booklet initiative.
+
+Historical Attribution:
+- The initial concept documentation and foundational repository files (commit dac145c, dated October 26, 2026) were authored by Cintia Pettersen and initially distributed under the MIT License.
+- Starting from version 0.1.0 (MVP Stage 3), the software source code and accompanying application architecture are licensed under the Apache License, Version 2.0.
+
+Medical Disclaimer:
+This application is designed as an educational and record-keeping tool for families during the first 1,000 days of life. It does not provide medical diagnoses, treatment prescriptions, or clinical triage. Users are advised to seek professional medical advice for any health-related concerns.

@@ -1,71 +1,114 @@
-# Open Child Health Booklet
+# Primeiros 1.000 Dias | Open Child Health Booklet
 
-**An open-source, offline-first digital child health booklet for the first 1,000 days.**
+**Companheiro digital de apoio, orientações e registros para os primeiros 1.000 dias de vida — da gestação aos dois anos da criança.**
 
-Families record vaccines, symptoms, medications and growth in one place — and bring an organized summary to every appointment. Vaccination schedules are configurable by country, starting with Brazil's National Immunization Program (PNI).
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-MVP_Fase_1-success.svg)](ROADMAP.md)
 
-> Status: early prototype (work in progress). Not a medical device. The booklet records and organizes information — it does not diagnose, prescribe or recommend treatment.
+> **Contexto:** Projeto independente de código aberto desenvolvido em preparação para a candidatura ao **UNICEF Venture Fund FemTech 2026**.  
+> *(Nota de transparência: Este projeto encontra-se em fase de prototipagem e desenvolvimento comunitário. Não há, até o momento, parceria formal, aprovação prévia, financiamento governamental ou validação clínica concluída).*
 
 ---
 
-## The problem
+## 1. O Conceito
 
-During pediatric appointments, doctors routinely ask *when did the fever start?*, *which was the last vaccine?*, *what medication did the child take?* — and families often can't remember.
+Os primeiros 1.000 dias (da concepção até o segundo aniversário) representam uma janela biológica e afetiva única para o desenvolvimento humano. No entanto, as mães e cuidadoras frequentemente enfrentam sobrecarga de tarefas, dúvidas diárias e informações dispersas.
 
-The information exists, but it is scattered: in the paper vaccination booklet, in phone photos and messages, or simply in a parent's memory. This weakens continuity of care, especially in the first 1,000 days of life, when visits are frequent and details matter — and especially for families moving between clinics, cities or public and private services.
+O **Primeiros 1.000 Dias** foi desenhado como uma ferramenta leve e humanizada, baseada em três pilares fundamentais:
 
-## The solution
+- **ORIENTAR:** Oferecer informações de saúde confiáveis, adaptadas exatamente à semana de gestação ou à idade do bebê, com citações oficiais de fontes públicas (Ministério da Saúde do Brasil e OMS).
+- **CUIDAR:** Transformar orientações teóricas em pequenas ações práticas do cotidiano (alimentação, vínculo afetivo, estimulação precoce e bem-estar materno), sem cobranças de desempenho.
+- **ACOMPANHAR:** Permitir registros simples de acontecimentos, saúde, observações da mãe e memórias afetivas, organizados em uma linha do tempo mensal.
 
-A lightweight digital booklet that any family can use and any clinic, developer or public health team can adopt and adapt:
+---
 
-- **Vaccination record** following the official national schedule (Brazil's PNI first; other countries can add their own schedule as a data file).
-- **Symptoms and illness episodes** with dates and notes.
-- **Medications** given at home (name, dose, time).
-- **Growth measurements** (weight, length/height, head circumference).
-- **Visit summary**: an organized one-page summary to show or share with the pediatrician.
-- **Works without internet**: data is stored on the family's own device. No account required.
-- **Family controls sharing**: nothing leaves the device unless the family chooses to export or share it.
+## 2. Princípios de Arquitetura
 
-## Design principles
+1. **Local-First & Resiliência Offline:** O aplicativo funciona diretamente no navegador através de tecnologias PWA e **IndexedDB**. Todos os registros permanecem salvos no próprio aparelho da família, funcionando perfeitamente sem conexão com a internet.
+2. **Privacidade por Design:** Não há cadastro obrigatório de e-mail, senha ou dados pessoais sensíveis em servidores centrais. A usuária é soberana sobre seus dados.
+3. **Não-Diagnóstico:** O sistema é uma ferramenta de apoio educativo e organizacional; não fornece diagnósticos médicos, prescrições de dosagem ou condutas clínicas autônomas.
+4. **Independência Tecnológica:** Todo o código é independente, de código aberto e executável por qualquer organização pública, prefeitura ou terceiro setor sem custos de licença proprietária.
 
-1. **Offline-first** — usable with low or no connectivity; installable as a Progressive Web App.
-2. **Privacy by design** — data stays on the device by default; aligned with LGPD (Brazil) and GDPR principles.
-3. **Record, don't diagnose** — the booklet organizes information for families and professionals; it never gives clinical advice.
-4. **Configurable by country** — schedules and content are data, not code.
-5. **Simple and accessible** — plain language, large touch targets, works on low-end phones.
-6. **Open** — MIT-licensed so clinics, NGOs and public services can reuse it freely.
+---
 
-## Architecture (planned)
+## 3. Estado Atual do MVP (O que já funciona)
+
+- [x] **Onboarding Rápido em 3 Passos:** Seleção de momento (Gestante vs. Bebê), fase/semana e foco de apoio principal, sem pedir dados pessoais.
+- [x] **Home Interativa com Check-in Reativo:** A resposta ao momento da mãe (*"Como foi a sua noite?"*) calibra dinamicamente as orientações de bem-estar do dia.
+- [x] **Três Recomendações Diárias:** Orientação para o bebê, sugestão de cuidado para a mãe e uma prática vinculada ao foco escolhido.
+- [x] **Integração Cuidados ➔ Jornada:** Botão *"Fiz essa atividade hoje"* que grava a prática diretamente na linha do tempo com observação opcional e proteção contra toques repetidos.
+- [x] **Jornada de Registros Contextualizada:** Opções de marcação rápida para Bebê e Mãe com perguntas de apoio, validação para acontecimentos sensíveis e suporte a datas anteriores.
+- [x] **Memórias com Sugestões Inspiradoras:** Ideias de escrita que estimulam relatos afetivos livres sem engessar a usuária em formulários rígidos.
+- [x] **Linha do Tempo Mensal com Busca e Filtros:** Navegação por mês/ano, busca textual em tempo real e filtros por categoria (`Bebê`, `Mãe`, `Memória`).
+- [x] **Soberania dos Dados:** Exportação de backup em `.json` e resumo legível para consultas de puericultura em `.txt`.
+- [x] **Limpeza Segura de Dados:** Exclusão local irreversível mediante confirmação explícita.
+
+*(O assistente de IA conectado via RAG e a sincronização em nuvem estão planejados para as próximas etapas no Roadmap).*
+
+---
+
+## 4. Como Executar Localmente
+
+### Pré-requisitos
+- **Node.js** v18.0.0 ou superior (testado no Node.js v24).
+- **npm** v9 ou superior.
+
+### Passo a Passo
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/cintiapettersen/open-child-health-booklet.git
+cd open-child-health-booklet
+
+# 2. Instale as dependências
+npm install
+
+# 3. Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+Abra seu navegador em: **[http://localhost:3000](http://localhost:3000)**.  
+*(Recomendamos abrir no celular ou ativar a simulação de tela de smartphone no navegador com `Cmd + Option + I` para testar a experiência mobile-first).*
+
+### Como Compilar para Produção
+
+```bash
+npm run build
+```
+O build estático e otimizado será gerado na pasta `dist/`, pronto para hospedagem em qualquer servidor estático ou CDN (Cloudflare Pages, Vercel, GitHub Pages).
+
+---
+
+## 5. Estrutura do Repositório
 
 ```
-open-child-health-booklet/
-├── app/                 # Offline-first web app (PWA): UI + local storage
-├── schedules/           # Vaccination schedules as JSON (e.g. br-pni.json)
-├── docs/                # Architecture, data model, privacy, roadmap
-└── LICENSE              # MIT
+├── .gitignore               # Regras de exclusão rigorosas (sem node_modules, dist ou segredos)
+├── LICENSE                  # Licença Apache License 2.0 para o código de software
+├── NOTICE                   # Atribuições históricas e avisos de integridade
+├── ARCHITECTURE.md          # Documentação detalhada da arquitetura técnica
+├── ROADMAP.md               # Planejamento das fases de desenvolvimento (12 meses)
+├── index.html               # Ponto de entrada HTML mobile-first
+├── package.json             # Dependências limpas (React 18, Vite, Lucide, TypeScript)
+├── tsconfig.json            # Configurações TypeScript
+├── vite.config.ts           # Configurações do Vite
+├── content/
+│   └── LICENSE-CONTENT.md   # Separação e atribuição dos conteúdos oficiais de saúde
+└── src/
+    ├── main.tsx             # Inicialização React
+    ├── App.tsx              # Orquestrador de fluxo e abas principais
+    ├── types/               # Definições de tipos TypeScript
+    ├── constants/           # Nomes provisórios e configurações desacopladas
+    ├── data/                # Catálogo de conteúdos oficiais e check-ins rotativos
+    ├── services/            # indexedDbService, ruleEngine, profileStorage
+    ├── styles/              # Design System acolhedor (Fraunces + Plus Jakarta Sans)
+    ├── components/          # Header, Navigation
+    └── views/               # Onboarding, TodayView, AskView, JourneyView, CareView
 ```
 
-- **Frontend:** plain web technologies (HTML/CSS/JavaScript) packaged as a PWA — no app store needed.
-- **Storage:** on-device (IndexedDB). Optional export/import (JSON/PDF) for backup or sharing.
-- **Schedules:** versioned JSON files describing vaccines, doses and recommended ages per country.
-- **Interoperability (roadmap):** explore standard formats (e.g. HL7 FHIR) to support future integration with public health records, always with family consent.
+---
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`ROADMAP.md`](ROADMAP.md).
+## 6. Licenciamento e Direitos Autorais
 
-## Relationship to Baby Kangoo
-
-This project is created by the team behind [Baby Kangoo](https://babykangoo.app), a family app that combines child health records and childhood memories.
-
-The **Open Child Health Booklet is an independent, open-source module**, written from scratch and released under the MIT license. Baby Kangoo remains a separate commercial product; the booklet can be used on its own by anyone, and Baby Kangoo may adopt it as a component.
-
-## Pilot (planned)
-
-First pilot in **Brazil**, with pediatric clinics and families served by **SUS**, Brazil's public health system, focusing on the first 1,000 days and on low-connectivity settings.
-
-## Contributing
-
-Contributions are welcome — especially vaccination schedules for other countries, translations and accessibility improvements. Please open an issue to discuss ideas.
-
-## License
-
-[MIT](LICENSE) © 2026 Cintia Pettersen
+- **Software:** Licenciado sob a [Apache License, Version 2.0](LICENSE).
+- **Atribuição Histórica:** O conceito e os arquivos fundacionais originais foram iniciados sob a licença MIT por Cintia Pettersen em outubro de 2026 (consulte o arquivo [NOTICE](NOTICE)).
+- **Conteúdos de Saúde:** As diretrizes e textos de saúde pública citados no aplicativo pertencem às suas respectivas instituições de origem (Ministério da Saúde do Brasil e OMS) e são utilizados estritamente para fins educativos e informativos de saúde pública (consulte [content/LICENSE-CONTENT.md](content/LICENSE-CONTENT.md)).

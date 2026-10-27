@@ -1,17 +1,36 @@
-# Roadmap (12 months)
+# Roadmap do Projeto (12 Meses)
 
-| Phase | Months | Goals |
-|------|--------|-------|
-| **0. Foundation** | 0–1 | Public repository, license, architecture, data model, Brazil PNI schedule as open data. |
-| **1. Working prototype** | 1–3 | Offline PWA: child profile, vaccine record by schedule, symptoms, medications, growth, visit summary, export/import. Portuguese and English. |
-| **2. Usability & privacy** | 3–5 | Usability tests with families and pediatricians; accessibility review; LGPD privacy review; low-end device and low-connectivity testing. |
-| **3. Pilot in Brazil** | 5–10 | Pilot with pediatric clinics and SUS-served families. Measure: active families, records per visit, schedule completeness, professional feedback. |
-| **4. Open & scale** | 10–12 | Publish results and anonymized aggregate metrics; documentation for reuse; second country schedule; integration study (e.g. HL7 FHIR / national records). |
+> **Candidatura:** Preparação para o UNICEF Venture Fund FemTech 2026  
+> **Natureza:** Software de Código Aberto / Bem Público Digital (em desenvolvimento)
 
-## Indicators (public, aggregated, anonymized)
-- Number of families and children registered
-- Vaccine doses recorded vs. expected by schedule
-- Visit summaries generated/shared
-- Share of sessions used offline
+---
 
-No personal health data is ever published.
+## Fases de Desenvolvimento
+
+| Fase | Período | Objetivos Principais | Status |
+| :--- | :---: | :--- | :---: |
+| **0. Fundação** | Mês 0 | Definição de premissas, repositório público, diretrizes de privacidade por design e modelo de dados preliminar. | **Concluída** |
+| **1. MVP Funcional Local-First** | Meses 1–3 | PWA estático, design system acolhedor, onboarding em 3 passos, Home interativa com check-in reativo, motor local de regras com catálogo oficial (MS/OMS), persistência em IndexedDB, linha do tempo mensal e exportação JSON/TXT. | **Concluída (v0.1.0)** |
+| **2. Assistente Educativo com RAG Desacoplado** | Meses 3–5 | Implementação de Edge API Gateway sem estado, indexação de diretrizes oficiais em base vetorial aberta, respostas com citação de fontes e filtros rigorosos contra emissão de diagnósticos. | *Próxima Etapa* |
+| **3. Usabilidade e Revisão com Cuidadoras** | Meses 5–7 | Testes de usabilidade com mães e profissionais de saúde da família; auditoria de acessibilidade (WCAG 2.1 AA); testes em celulares de entrada e redes de baixa conectividade. | *Planejado* |
+| **4. Piloto Comunitário em Atenção Primária** | Meses 7–12 | Projeto piloto em Unidades Básicas de Saúde (UBS) parceiras; medição de continuidade do cuidado e engajamento da família no acompanhamento do desenvolvimento infantil. | *Planejado* |
+
+---
+
+## O que já está implementado (Versão Atual)
+- [x] Estrutura React 18 + TypeScript + Vite.
+- [x] Onboarding simplificado sem solicitação de e-mail ou dados pessoais.
+- [x] Home interativa com check-in reativo e adaptação imediata das orientações.
+- [x] Catálogo de orientações oficiais com referências bibliográficas auditáveis (Caderneta da Criança, Caderneta da Gestante, OMS).
+- [x] Integração direta entre cartões de Cuidados e registros da Jornada.
+- [x] Persistência estruturada em IndexedDB local com prevenção de toques repetidos.
+- [x] Registro com suporte a datas anteriores e contexto obrigatório para acontecimentos sensíveis.
+- [x] Linha do tempo com navegação mensal, busca textual e filtros por categoria.
+- [x] Exportação de backup em `.json` e relatório para puericultura em `.txt`.
+
+## O que ainda NÃO está implementado nesta fase
+- Conexão em nuvem com provedores de Inteligência Artificial (prevista para a Fase 2).
+- Notificações push em segundo plano.
+- Sincronização multi-dispositivo ou autenticação centralizada.
+- Integração formal com prontuários eletrônicos do SUS (e-SUS / SISAB).
+- Validação clínica longitudinal (objeto do plano piloto de 12 meses).
