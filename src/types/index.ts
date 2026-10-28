@@ -42,7 +42,8 @@ export type ContentCategory =
   | 'mom_care'
   | 'feeding'
   | 'development'
-  | 'wellbeing';
+  | 'wellbeing'
+  | 'safety_prevention';
 
 export interface ContentItem {
   id: string;
@@ -58,7 +59,7 @@ export interface ContentItem {
   practicalAction?: string;
   tagLabel?: string;
   source: string;
-  validationStatus: 'verified' | 'demonstrative';
+  validationStatus: 'verified' | 'demonstrative' | 'pending_review';
 }
 
 // Tipos para Perguntas Rápidas de Check-in na Home

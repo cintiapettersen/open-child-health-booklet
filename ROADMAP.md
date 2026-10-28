@@ -12,28 +12,29 @@
 | **0. Fundação** | Mês 0 | Definição de premissas, repositório público, diretrizes de privacidade por design e modelo de dados preliminar. | **Concluída** |
 | **1. MVP Funcional Local-First** | Meses 1–3 | PWA estático, design system acolhedor, onboarding em 3 passos, Home interativa com check-in reativo, motor local de regras com catálogo oficial (MS/OMS), persistência em IndexedDB, linha do tempo mensal e exportação JSON/TXT. | **Concluída (v0.1.0)** |
 | **1.1. Internacionalização (i18n)** | Mês 3 | Suporte bilíngue completo (pt-BR e en), dicionários tipados em TypeScript, seletor de idioma discreto (PT \| EN), governança clínica e diretrizes de localização (`LOCALIZATION.md`). | **Concluída (v0.1.1)** |
-| **2. Assistente Educativo com RAG Desacoplado** | Meses 3–5 | Implementação de Edge API Gateway sem estado, indexação de diretrizes oficiais em base vetorial aberta, respostas com citação de fontes e filtros rigorosos contra emissão de diagnósticos. | *Próxima Etapa (Etapa 4)* |
-| **3. Usabilidade e Revisão com Cuidadoras** | Meses 5–7 | Testes de usabilidade com mães e profissionais de saúde da família; auditoria de acessibilidade (WCAG 2.1 AA); testes em celulares de entrada e redes de baixa conectividade. | *Planejado* |
-| **4. Piloto Comunitário em Atenção Primária** | Meses 7–12 | Projeto piloto em Unidades Básicas de Saúde (UBS) parceiras; medição de continuidade do cuidado e engajamento da família no acompanhamento do desenvolvimento infantil. | *Planejado* |
+| **2. Assistente Educativo com RAG Desacoplado** | Meses 3–4 | Edge API Gateway Cloudflare Workers, RAG com busca lexical/BM25, sanitizador de PII no cliente, salvaguardas imediatas para emergências (SAMU 192), suporte desacoplado ao Gemini 3.5 Flash-Lite e suíte de 112 testes automatizados. | **Concluída (v0.2.0)** |
+| **3. Resiliência Offline & Restauração Atômica** | Meses 4–5 | PWA com Service Worker Cache-First/Stale-While-Revalidate, remoção de bloqueio de rede para fontes, importador e restaurador de backup JSON com transações atômicas no IndexedDB (mesclagem e substituição com rollback), e isolamento de privacidade no cache. | **Concluída (v0.3.0)** |
+| **4. Usabilidade e Revisão com Cuidadoras** | Meses 5–7 | Testes de usabilidade com mães e profissionais de saúde da família; auditoria de acessibilidade (WCAG 2.1 AA); testes em celulares de entrada e redes de baixa conectividade. | *Próxima Etapa (Etapa 6)* |
+| **5. Piloto Comunitário em Atenção Primária** | Meses 7–12 | Projeto piloto em Unidades Básicas de Saúde (UBS) parceiras; medição de continuidade do cuidado e engajamento da família no acompanhamento do desenvolvimento infantil. | *Planejado* |
 
 ---
 
 ## O que já está implementado (Versão Atual)
 - [x] Estrutura React 18 + TypeScript + Vite.
-- [x] Suporte bilíngue nativo em Português brasileiro (`pt-BR`) e Inglês internacional (`en`) sem chamadas de IA pagas.
-- [x] Seletor discreto `PT | EN` no Onboarding e no Header principal.
+- [x] Arquitetura sem login nem coleta de dados pessoais.
+- [x] Suporte bilíngue nativo em Português brasileiro (`pt-BR`) e Inglês internacional (`en`).
+- [x] PWA com manifesto e Service Worker operando offline sem bloqueio de rede para fontes.
 - [x] Onboarding simplificado sem solicitação de e-mail ou dados pessoais.
 - [x] Home interativa com check-in reativo e adaptação imediata das orientações.
 - [x] Catálogo de orientações oficiais com referências bibliográficas auditáveis (Caderneta da Criança, Caderneta da Gestante, OMS) em ambos os idiomas.
 - [x] Integração direta entre cartões de Cuidados e registros da Jornada.
 - [x] Persistência estruturada em IndexedDB local com prevenção de toques repetidos.
-- [x] Registro com suporte a datas anteriores e contexto obrigatório para acontecimentos sensíveis.
-- [x] Linha do tempo com navegação mensal, busca textual e filtros por categoria.
-- [x] Exportação de backup em `.json` e relatório para puericultura em `.txt` formatado no idioma ativo.
+- [x] Exportação de backup em `.JSON` e resumo formatado para puericultura em `.TXT`.
+- [x] Restauração atômica de backup com validação de esquema 1.0, prévia informativa, modo mesclar e modo substituição com confirmação explícita.
+- [x] Aba Pergunte com Edge Gateway desacoplado, PII scrubber local, detector de emergência (SAMU 192), e RAG com citações auditáveis.
 
 ## O que ainda NÃO está implementado nesta fase
-- Conexão em nuvem com provedores de Inteligência Artificial (prevista para a Fase 2 / Etapa 4).
 - Notificações push em segundo plano.
-- Sincronização multi-dispositivo ou autenticação centralizada.
+- Sincronização multi-dispositivo ou autenticação centralizada (mantido Local-First propositalmente para privacidade).
 - Integração formal com prontuários eletrônicos do SUS (e-SUS / SISAB).
-- Validação clínica longitudinal (objeto do plano piloto de 12 meses).
+- Validação clínica longitudinal colegiada (objeto do plano piloto de 12 meses).

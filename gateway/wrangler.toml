@@ -1,0 +1,20 @@
+name = "first-1000-days-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-10-01"
+
+[vars]
+# MOCK_MODE: Quando "true", simula respostas fundamentadas em RAG sem chamar a API externa do Google
+# Para ativar produção: definir como "false" e adicionar o segredo GEMINI_API_KEY via `wrangler secret put GEMINI_API_KEY`
+MOCK_MODE = "true"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+MAX_QUESTION_LENGTH = 300
+RATE_LIMIT_PER_WINDOW = 15
+RATE_LIMIT_WINDOW_SECONDS = 600
+DAILY_GLOBAL_QUOTA = 500
+ALLOWED_ORIGIN = "*"
+
+# [env.production]
+# route = { pattern = "api.primeiros1000dias.org/*", zone_name = "primeiros1000dias.org" }
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# id = "exemplo_id_kv_producao"

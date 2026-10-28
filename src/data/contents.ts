@@ -4,19 +4,19 @@ export const CONTENTS_CATALOG_PT: ContentItem[] = [
   // --- MÃE & BEM-ESTAR ---
   {
     id: 'mom-rest-fragmented',
-    title: 'A importância do descanso materno fragmentado',
+    title: 'Descanso e divisão de cuidados no puerpério',
     category: 'wellbeing',
     categoryLabel: 'Bem-estar Materno',
     audience: 'mom',
     phase: 'baby',
     minStageMonths: 0,
     maxStageMonths: 6,
-    theme: 'Descanso e Recuperação',
-    educationalText: 'O sono no pós-parto inicial é naturalmente fragmentado pelo ritmo biológico do recém-nascido. Descansar em blocos de 30 a 90 minutos quando o bebê dorme auxilia na regulação dos níveis de cortisol e na estabilização do humor.',
-    practicalAction: 'Faça uma pausa de 20 minutos com os olhos fechados e os pés elevados, mesmo sem adormecer profundamente.',
-    tagLabel: 'Pausa intencional para descansar',
-    source: 'Caderneta da Gestante / Ministério da Saúde (Edição 2023, pág. 38)',
-    validationStatus: 'verified'
+    theme: 'Descanso e Rede de Apoio',
+    educationalText: 'O ritmo de sono no início do puerpério acompanha as necessidades frequentes do bebê. A orientação de saúde pública é repousar nos intervalos em que o recém-nascido dorme e compartilhar os afazeres domésticos com a rede de apoio para preservar a recuperação física e mental da mãe.',
+    practicalAction: 'Aproveite uma das sonecas do bebê para se deitar e descansar, delegando as tarefas da casa para a sua rede de apoio.',
+    tagLabel: 'Pausa para descanso compartilhado',
+    source: 'Caderneta da Gestante / Ministério da Saúde (6ª Edição, 2023, pág. 38)',
+    validationStatus: 'pending_review'
   },
   {
     id: 'mom-self-compassion',
@@ -65,6 +65,72 @@ export const CONTENTS_CATALOG_PT: ContentItem[] = [
     tagLabel: 'Alongamento e alívio da musculatura',
     source: 'Caderneta da Gestante / Ministério da Saúde (2023)',
     validationStatus: 'verified'
+  },
+
+  // --- SEGURANÇA E PREVENÇÃO (NOVA CATEGORIA) ---
+  {
+    id: 'safety-safe-sleep',
+    title: 'Sono seguro: de barriga para cima e berço livre',
+    category: 'safety_prevention',
+    categoryLabel: 'Segurança & Prevenção',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 12,
+    theme: 'Prevenção de Asfixia e Morte Súbita',
+    educationalText: 'Colocar o bebê para dormir de barriga para cima (posição supina) é a medida mais eficaz na prevenção da Síndrome da Morte Súbita do Lactente. O colchão deve ser firme e o berço deve estar livre de travesseiros, protetores acolchoados, cobertores soltos e bichos de pelúcia.',
+    practicalAction: 'Verifique se o espaço de sono do bebê está plano, firme e totalmente desimpedido antes de colocá-lo para dormir.',
+    tagLabel: 'Berço seguro e posição de barriga para cima',
+    source: 'Caderneta da Criança / Ministério da Saúde (2023, pág. 26) e Sociedade Brasileira de Pediatria (SBP)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-elevated-surfaces',
+    title: 'Prevenção de quedas em superfícies elevadas',
+    category: 'safety_prevention',
+    categoryLabel: 'Segurança & Prevenção',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Prevenção de Quedas',
+    educationalText: 'Bebês podem se virar, empurrar com os pés ou rolar inesperadamente desde as primeiras semanas. Quedas de trocadores, camas de casal e sofás são causas frequentes de traumatismo cranioencefálico em lactentes.',
+    practicalAction: 'Mantenha sempre uma mão firme sobre o bebê durante a troca de fraldas e nunca o deixe desacompanhado em superfícies altas, nem por um segundo.',
+    tagLabel: 'Atenção redobrada em superfícies elevadas',
+    source: 'Guia de Prevenção de Acidentes na Infância / Sociedade Brasileira de Pediatria (SBP)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-bath-water',
+    title: 'Segurança e prevenção no banho',
+    category: 'safety_prevention',
+    categoryLabel: 'Segurança & Prevenção',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Segurança no Banho',
+    educationalText: 'A pele do bebê é muito mais fina e sensível ao calor que a de um adulto. Além disso, afogamentos podem ocorrer em poucos centímetros de água e em silêncio absoluto.',
+    practicalAction: 'Teste a temperatura da água com a parte interna do antebraço (deve estar morna, em torno de 36-37°C) e nunca se afaste da banheira com o bebê dentro.',
+    tagLabel: 'Teste térmico e supervisão constante no banho',
+    source: 'Caderneta da Criança / Ministério da Saúde (2023, Cuidados com o Recém-Nascido)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-choking-small-objects',
+    title: 'Prevenção de engasgos e perigo de peças pequenas',
+    category: 'safety_prevention',
+    categoryLabel: 'Segurança & Prevenção',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 3,
+    maxStageMonths: 24,
+    theme: 'Prevenção de Sufocação',
+    educationalText: 'Ao aprender a agarrar e levar objetos à boca (fase oral exploratória), o bebê explora o ambiente. Qualquer objeto menor que o diâmetro de um rolo de papel higiênico (moedas, tampas de caneta, baterias de botão, brinquedos quebrados) representa grave risco de engasgo e asfixia.',
+    practicalAction: 'Faça uma varredura visual no chão e nas mesinhas de centro, guardando pequenos objetos e remédios em gavetas travadas.',
+    tagLabel: 'Ambiente seguro e livre de peças miúdas',
+    source: 'Guia de Segurança na Infância / Sociedade Brasileira de Pediatria (SBP) e UNICEF',
+    validationStatus: 'pending_review'
   },
 
   // --- BEBÊ & DESENVOLVIMENTO ---
@@ -190,19 +256,19 @@ export const CONTENTS_CATALOG_EN: ContentItem[] = [
   // --- MOTHER & WELLBEING ---
   {
     id: 'mom-rest-fragmented',
-    title: 'The importance of fragmented maternal rest',
+    title: 'Postpartum rest and shared care',
     category: 'wellbeing',
     categoryLabel: 'Maternal Wellbeing',
     audience: 'mom',
     phase: 'baby',
     minStageMonths: 0,
     maxStageMonths: 6,
-    theme: 'Rest and Recovery',
-    educationalText: 'Sleep during the early postpartum period is naturally fragmented by the newborn\'s biological rhythm. Resting in 30- to 90-minute blocks when the baby sleeps helps regulate cortisol levels and stabilize mood.',
-    practicalAction: 'Take a 20-minute break with your eyes closed and feet elevated, even without falling into deep sleep.',
-    tagLabel: 'Intentional pause to rest',
-    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition, p. 38)',
-    validationStatus: 'verified'
+    theme: 'Rest and Support Network',
+    educationalText: 'Sleep patterns in the early postpartum period naturally follow the baby’s frequent feeding and care needs. Public health guidelines recommend resting whenever the newborn sleeps and sharing household chores with support partners to enable maternal physical and emotional recovery.',
+    practicalAction: 'Use one of baby’s nap times to lie down and rest, delegating household chores to your support network.',
+    tagLabel: 'Pause for shared rest',
+    source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (6th Edition, 2023, p. 38)',
+    validationStatus: 'pending_review'
   },
   {
     id: 'mom-self-compassion',
@@ -251,6 +317,72 @@ export const CONTENTS_CATALOG_EN: ContentItem[] = [
     tagLabel: 'Muscle stretching and tension relief',
     source: 'Pregnant Woman\'s Handbook / Ministry of Health (Brazil) (2023 Edition)',
     validationStatus: 'verified'
+  },
+
+  // --- SAFETY & PREVENTION (NEW CATEGORY) ---
+  {
+    id: 'safety-safe-sleep',
+    title: 'Safe sleep: on back with a clear crib',
+    category: 'safety_prevention',
+    categoryLabel: 'Safety & Prevention',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 12,
+    theme: 'Suffocation and SIDS Prevention',
+    educationalText: 'Placing babies on their backs (supine position) to sleep is the single most effective measure to prevent Sudden Infant Death Syndrome (SIDS). The mattress should be firm, and the crib must remain free of pillows, padded bumpers, loose blankets, and stuffed toys.',
+    practicalAction: 'Ensure the baby’s sleep area is flat, firm, and completely clear before laying baby down to sleep.',
+    tagLabel: 'Safe crib and back-to-sleep position',
+    source: 'Child Health Record Handbook / Ministry of Health (Brazil) (2023, p. 26) and Brazilian Society of Pediatrics (SBP)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-elevated-surfaces',
+    title: 'Preventing falls from elevated surfaces',
+    category: 'safety_prevention',
+    categoryLabel: 'Safety & Prevention',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Fall Prevention',
+    educationalText: 'Babies can wiggle, push with their feet, or roll unexpectedly from early weeks onward. Falls from changing tables, adult beds, and sofas are a leading cause of head trauma in infants.',
+    practicalAction: 'Always keep one firm hand on the baby during diaper changes and never leave baby unattended on elevated surfaces, even for a second.',
+    tagLabel: 'Close supervision on elevated surfaces',
+    source: 'Childhood Injury Prevention Guidelines / Brazilian Society of Pediatrics (SBP)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-bath-water',
+    title: 'Bath safety: preventing burns and drowning',
+    category: 'safety_prevention',
+    categoryLabel: 'Safety & Prevention',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 0,
+    maxStageMonths: 24,
+    theme: 'Bath Safety',
+    educationalText: 'An infant’s skin is much thinner and more sensitive to heat than an adult’s. Additionally, drowning can occur silently in just a few inches of water.',
+    practicalAction: 'Test the water temperature using the inside of your forearm (it should feel pleasantly lukewarm, around 36-37°C / 97-98°F) and never step away from the tub.',
+    tagLabel: 'Temperature check and uninterrupted supervision in bath',
+    source: 'Child Health Record Handbook / Ministry of Health (Brazil) (2023, Newborn Care Guidelines)',
+    validationStatus: 'pending_review'
+  },
+  {
+    id: 'safety-choking-small-objects',
+    title: 'Preventing choking and small object hazards',
+    category: 'safety_prevention',
+    categoryLabel: 'Safety & Prevention',
+    audience: 'baby',
+    phase: 'baby',
+    minStageMonths: 3,
+    maxStageMonths: 24,
+    theme: 'Choking Prevention',
+    educationalText: 'As babies learn to grasp and bring items to their mouth (oral exploratory phase), any object smaller than a toilet paper roll diameter (coins, pen caps, button batteries, loose buttons) poses a serious choking hazard.',
+    practicalAction: 'Scan floors and low surfaces at baby eye level, keeping small items and button batteries securely locked away.',
+    tagLabel: 'Small-parts-free play area',
+    source: 'Child Safety Guidelines / Brazilian Society of Pediatrics (SBP) and UNICEF',
+    validationStatus: 'pending_review'
   },
 
   // --- BABY & DEVELOPMENT ---

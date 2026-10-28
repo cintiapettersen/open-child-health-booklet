@@ -18,8 +18,11 @@ A tradução e localização de um aplicativo de saúde materna e infantil difer
 3. **Integridade de Fontes Oficiais:**  
    A tradução de um conteúdo para inglês **não substitui** sua fonte oficial de origem por uma instituição estrangeira aleatória. As referências originais (como o Ministério da Saúde do Brasil e a Sociedade Brasileira de Pediatria) são mantidas e descritas com precisão em inglês, acompanhadas de diretrizes correlatas da OMS (*World Health Organization*) quando aplicável.
 
-4. **Identificação Transparente de Conteúdo Demonstrativo:**  
-   Orientações que ainda não passaram por validação clínica formal e colegiada permanecem expressamente categorizadas como `validationStatus: 'demonstrative'` em todos os idiomas.
+4. **Identificação Transparente de Conteúdo Demonstrativo e em Revisão:**  
+   Orientações que ainda não passaram por validação clínica formal e colegiada permanecem expressamente categorizadas como `validationStatus: 'demonstrative'` ou `'pending_review'` em todos os idiomas. Manejos práticos empíricos (como técnicas de massagem ou manobras posturais) não são apresentados como tratamentos garantidos.
+
+5. **Paridade Rigorosa de Formulários e Modais:**  
+   Todas as mensagens de validação, avisos de privacidade, confirmações de risco irreversível e fluxos de importação/restauração de backup possuem paridade de 100% entre português e inglês, garantindo a mesma clareza ética a usuárias de qualquer nacionalidade.
 
 ---
 

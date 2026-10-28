@@ -17,6 +17,9 @@ dist-ssr
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # Arquivos temporários e de SO
 .DS_Store
@@ -32,3 +35,6 @@ resumo_puericultura_*.txt
 # Build e cache
 .vite
 .cache
+.wrangler
+*.test.cjs
+gateway/scripts/localGateway.cjs

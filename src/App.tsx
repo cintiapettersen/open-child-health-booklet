@@ -111,6 +111,7 @@ const MainApp: React.FC = () => {
               records={records}
               onAddRecord={handleAddRecord}
               onClearRecords={handleClearRecords}
+              onRestoreRecords={(updated) => setRecords(updated)}
               storageError={storageError}
             />
           )}

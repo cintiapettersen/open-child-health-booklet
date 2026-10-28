@@ -20,14 +20,19 @@ import {
   FileText,
   Trash2,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  ShieldAlert,
+  CheckCircle2
 } from 'lucide-react';
+import { BackupValidationResult } from '../services/indexedDbService';
 
 interface JourneyViewProps {
   profile: UserProfile;
   records: JourneyRecord[];
   onAddRecord: (record: JourneyRecord) => void;
   onClearRecords: () => void;
+  onRestoreRecords?: (updated: JourneyRecord[]) => void;
   storageError?: string | null;
 }
 
@@ -42,6 +47,7 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
   records,
   onAddRecord,
   onClearRecords,
+  onRestoreRecords,
   storageError
 }) => {
   const { language, t } = useLanguage();
@@ -58,9 +64,90 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
   const [activeFilterSubject, setActiveFilterSubject] = useState<'all' | RecordSubject>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modais de Exportação e Limpeza
+  // Modais de Exportação, Restauração e Limpeza
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isConfirmClearOpen, setIsConfirmClearOpen] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [restoreFileName, setRestoreFileName] = useState<string | null>(null);
+  const [restoreValidation, setRestoreValidation] = useState<BackupValidationResult | null>(null);
+  const [restoreMode, setRestoreMode] = useState<'merge' | 'replace'>('merge');
+  const [confirmReplace, setConfirmReplace] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [restoreSuccessMsg, setRestoreSuccessMsg] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleOpenRestoreModal = () => {
+    setIsExportMenuOpen(false);
+    setRestoreFileName(null);
+    setRestoreValidation(null);
+    setRestoreMode('merge');
+    setConfirmReplace(false);
+    setRestoreError(null);
+    setRestoreSuccessMsg(null);
+    setIsRestoreModalOpen(true);
+  };
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRestoreError(null);
+    setRestoreSuccessMsg(null);
+    setRestoreValidation(null);
+    setConfirmReplace(false);
+
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setRestoreFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const validation = indexedDbService.validateBackupJson(text);
+        if (!validation.valid) {
+          setRestoreError(validation.errorMessage || 'Arquivo inválido.');
+        } else {
+          setRestoreValidation(validation);
+        }
+      } catch (err: any) {
+        setRestoreError(err?.message || 'Erro ao processar arquivo.');
+      }
+    };
+    reader.onerror = () => {
+      setRestoreError('Falha ao ler o arquivo local.');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleExecuteRestore = async () => {
+    if (!restoreValidation?.records) return;
+    if (restoreMode === 'replace' && !confirmReplace) return;
+
+    setIsRestoring(true);
+    setRestoreError(null);
+
+    try {
+      let result;
+      if (restoreMode === 'replace') {
+        result = await indexedDbService.restoreBackupReplace(restoreValidation.records);
+      } else {
+        result = await indexedDbService.restoreBackupMerge(restoreValidation.records);
+      }
+
+      const updatedRecords = await indexedDbService.getRecords();
+      if (onRestoreRecords) {
+        onRestoreRecords(updatedRecords);
+      }
+
+      setRestoreSuccessMsg(t.journey.restoreSuccessMsg(result.importedCount, result.skippedCount));
+      setRestoreValidation(null);
+      setRestoreFileName(null);
+    } catch (err: any) {
+      setRestoreError(err?.message || 'Erro durante a restauração no IndexedDB.');
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   // Seleção de Data do Acontecimento (Permite datas anteriores)
   const todayISO = new Date().toISOString().split('T')[0];
@@ -905,6 +992,18 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
                 </div>
               </button>
 
+              <button
+                onClick={handleOpenRestoreModal}
+                className="btn btn-secondary"
+                style={{ justifyContent: 'flex-start', padding: '12px 14px', fontSize: '0.88rem' }}
+              >
+                <Upload size={16} color="var(--terracotta)" />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600 }}>{t.journey.restoreBtnTitle}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.journey.restoreBtnDesc}</div>
+                </div>
+              </button>
+
               <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px', marginTop: '6px' }}>
                 <button
                   onClick={() => {
@@ -1006,6 +1105,290 @@ export const JourneyView: React.FC<JourneyViewProps> = ({
               >
                 {t.journey.clearModalConfirmBtn}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: RESTAURAÇÃO DE BACKUP LOCAL (.JSON) */}
+      {isRestoreModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 110,
+            padding: '20px',
+            overflowY: 'auto'
+          }}
+        >
+          <div
+            className="card"
+            style={{
+              width: '100%',
+              maxWidth: '430px',
+              padding: '22px',
+              marginBottom: 0,
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Upload size={20} color="var(--terracotta)" />
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{t.journey.restoreModalTitle}</h3>
+              </div>
+              <button
+                onClick={() => setIsRestoreModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+                aria-label={t.journey.closeBtn}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: '14px' }}>
+              {t.journey.restoreModalDesc}
+            </p>
+
+            {/* Aviso de Privacidade */}
+            <div
+              style={{
+                backgroundColor: '#FEF3C7',
+                borderLeft: '3px solid #D97706',
+                padding: '10px 12px',
+                borderRadius: '4px',
+                fontSize: '0.78rem',
+                color: '#92400E',
+                marginBottom: '16px',
+                lineHeight: 1.4,
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'flex-start'
+              }}
+            >
+              <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>{t.journey.restorePrivacyWarning}</div>
+            </div>
+
+            {/* Seletor de Arquivo */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".json,application/json"
+              style={{ display: 'none' }}
+              onChange={handleFileSelected}
+            />
+
+            <div style={{ marginBottom: '16px' }}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="btn btn-secondary"
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: '0.88rem', gap: '8px' }}
+              >
+                <Upload size={16} />
+                <span>{restoreFileName ? restoreFileName : t.journey.restoreSelectFileBtn}</span>
+              </button>
+            </div>
+
+            {/* Alerta de Erro */}
+            {restoreError && (
+              <div
+                style={{
+                  backgroundColor: '#FFF2F2',
+                  borderLeft: '3px solid #D9534F',
+                  padding: '10px 12px',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                  color: '#7A2E2E',
+                  marginBottom: '16px',
+                  lineHeight: 1.4
+                }}
+              >
+                <strong>{t.journey.restoreErrorTitle}</strong>
+                <div style={{ marginTop: '4px' }}>{restoreError}</div>
+              </div>
+            )}
+
+            {/* Alerta de Sucesso */}
+            {restoreSuccessMsg && (
+              <div
+                style={{
+                  backgroundColor: '#ECFDF5',
+                  borderLeft: '3px solid #10B981',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  fontSize: '0.85rem',
+                  color: '#065F46',
+                  marginBottom: '16px',
+                  lineHeight: 1.4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <CheckCircle2 size={18} color="#10B981" />
+                <span>{restoreSuccessMsg}</span>
+              </div>
+            )}
+
+            {/* Prévia e Opções de Restauração */}
+            {restoreValidation?.valid && !restoreSuccessMsg && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '16px' }}>
+                <div
+                  style={{
+                    backgroundColor: '#F8F9FA',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '6px',
+                    padding: '12px'
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-main)' }}>
+                    {t.journey.restorePreviewTitle}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                    <div>• {t.journey.restoreTotalRecords(restoreValidation.recordCount)}</div>
+                    {restoreValidation.dateRange && (
+                      <div>• {t.journey.restoreDateRange(restoreValidation.dateRange.min, restoreValidation.dateRange.max)}</div>
+                    )}
+                    {restoreValidation.subjectCounts && (
+                      <div>
+                        • {t.journey.restoreCounts(
+                          restoreValidation.subjectCounts.baby,
+                          restoreValidation.subjectCounts.mom,
+                          restoreValidation.subjectCounts.memory
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Seletor de Modo */}
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '8px', color: 'var(--text-main)' }}>
+                    {t.journey.restoreModeTitle}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        padding: '8px 10px',
+                        borderRadius: '6px',
+                        border: restoreMode === 'merge' ? '1px solid var(--terracotta)' : '1px solid var(--border-light)',
+                        backgroundColor: restoreMode === 'merge' ? '#FFF9F5' : 'transparent'
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="restoreMode"
+                        checked={restoreMode === 'merge'}
+                        onChange={() => setRestoreMode('merge')}
+                        style={{ marginTop: '2px' }}
+                      />
+                      <span>{t.journey.restoreModeMerge}</span>
+                    </label>
+
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        padding: '8px 10px',
+                        borderRadius: '6px',
+                        border: restoreMode === 'replace' ? '1px solid #B23B3B' : '1px solid var(--border-light)',
+                        backgroundColor: restoreMode === 'replace' ? '#FFF2F2' : 'transparent'
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="restoreMode"
+                        checked={restoreMode === 'replace'}
+                        onChange={() => setRestoreMode('replace')}
+                        style={{ marginTop: '2px' }}
+                      />
+                      <span>{t.journey.restoreModeReplace}</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Confirmação explícita se modo replace */}
+                {restoreMode === 'replace' && (
+                  <div
+                    style={{
+                      backgroundColor: '#FFF2F2',
+                      border: '1px solid #EAA8A8',
+                      borderRadius: '6px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.78rem', color: '#7A2E2E', lineHeight: 1.35 }}>
+                      {t.journey.restoreConfirmReplaceWarning}
+                    </div>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        color: '#B23B3B',
+                        fontWeight: 600
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={confirmReplace}
+                        onChange={(e) => setConfirmReplace(e.target.checked)}
+                        style={{ marginTop: '2px' }}
+                      />
+                      <span>{t.journey.restoreConfirmReplaceCheckbox}</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Botões de Ação */}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+              <button
+                onClick={() => setIsRestoreModalOpen(false)}
+                className="btn btn-secondary"
+                style={{ flex: 1, minHeight: '40px', fontSize: '0.85rem' }}
+              >
+                {t.journey.restoreCancelBtn}
+              </button>
+
+              {restoreValidation?.valid && !restoreSuccessMsg && (
+                <button
+                  onClick={handleExecuteRestore}
+                  disabled={isRestoring || (restoreMode === 'replace' && !confirmReplace)}
+                  className="btn btn-primary"
+                  style={{
+                    flex: 1,
+                    minHeight: '40px',
+                    fontSize: '0.85rem',
+                    backgroundColor: restoreMode === 'replace' ? '#B23B3B' : 'var(--terracotta)',
+                    opacity: (restoreMode === 'replace' && !confirmReplace) || isRestoring ? 0.6 : 1
+                  }}
+                >
+                  {isRestoring ? 'Processando...' : t.journey.restoreExecuteBtn}
+                </button>
+              )}
             </div>
           </div>
         </div>

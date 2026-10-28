@@ -4,7 +4,7 @@ import { getContentCatalog } from '../data/contents';
 import { journeyStorage } from '../services/journeyStorage';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedStageLabel } from '../locales';
-import { Baby, Flower2, Milk, Sparkles, BookOpen, Check, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Baby, Flower2, Milk, Sparkles, BookOpen, Check, ArrowRight, ShieldCheck, Shield, AlertCircle } from 'lucide-react';
 
 interface CareViewProps {
   profile: UserProfile;
@@ -20,6 +20,7 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
 
   const categories = [
     { id: 'all', label: t.care.catAll },
+    { id: 'safety_prevention', label: t.care.catSafety, icon: Shield },
     { id: 'wellbeing', label: t.care.catMom, icon: Flower2 },
     { id: 'development', label: t.care.catDevelopment, icon: Baby },
     { id: 'feeding', label: t.care.catFeeding, icon: Milk },
@@ -132,9 +133,21 @@ export const CareView: React.FC<CareViewProps> = ({ profile, onAddRecord, onNavi
                 <span className="tag-badge tag-sage" style={{ fontSize: '0.72rem' }}>
                   {art.categoryLabel}
                 </span>
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-soft)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                  <ShieldCheck size={12} color="var(--sage)" /> {language === 'en' ? 'Official Guideline' : 'Fonte Oficial'}
-                </span>
+                {art.validationStatus === 'verified' && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--sage)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <ShieldCheck size={12} color="var(--sage)" /> {language === 'en' ? 'Official Guideline' : 'Fonte Oficial'}
+                  </span>
+                )}
+                {art.validationStatus === 'pending_review' && (
+                  <span style={{ fontSize: '0.72rem', color: '#99631E', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <AlertCircle size={12} color="#99631E" /> {language === 'en' ? 'Under Clinical Review' : 'Em Revisão Clínica'}
+                  </span>
+                )}
+                {art.validationStatus === 'demonstrative' && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-soft)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    {language === 'en' ? 'Demonstrative' : 'Demonstrativo'}
+                  </span>
+                )}
               </div>
 
               <h2 className="card-title" style={{ fontSize: '1.1rem', marginTop: '4px' }}>

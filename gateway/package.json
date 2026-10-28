@@ -1,0 +1,30 @@
+{
+  "name": "first-1000-days-gateway",
+  "version": "0.4.0",
+  "type": "module",
+  "description": "Decoupled Edge Gateway & RAG engine for First 1,000 Days UNICEF FemTech 2026",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev --ip 127.0.0.1 --port 8787",
+    "dev:local": "npm run build:server && node scripts/localGateway.cjs",
+    "build:server": "esbuild scripts/localGateway.ts --bundle --platform=node --outfile=scripts/localGateway.cjs",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "node --loader ts-node/esm test/gateway.test.ts"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "rag",
+    "femtech",
+    "unicef",
+    "gemini",
+    "dpg"
+  ],
+  "author": "Open Child Health Booklet Contributors",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.80.0"
+  }
+}

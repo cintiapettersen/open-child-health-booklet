@@ -1,0 +1,14 @@
+# Configuração Local para o Gateway do First 1,000 Days
+# ATENÇÃO: Nunca compartilhe esta chave e nunca cometa o arquivo .dev.vars no git.
+# O arquivo .dev.vars é ignorado pelo .gitignore e lido exclusivamente pelo Wrangler em desenvolvimento local.
+
+# Chave exclusiva do projeto First 1,000 Days no Google AI Studio (com faturamento vinculado)
+GEMINI_API_KEY=sua_chave_do_google_ai_studio_aqui
+
+# Modo de operação:
+# "true" = Modo Mock educativo (padrão, sem consumo externo de tokens ou custos)
+# "false" = Modo Live (executa chamada real ao modelo especificado via API)
+MOCK_MODE=false
+
+# Modelo selecionado
+GEMINI_MODEL=gemini-3.5-flash-lite

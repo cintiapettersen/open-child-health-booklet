@@ -1,4 +1,4 @@
-import { JourneyRecord, UserProfile, SupportedLanguage } from '../types';
+import type { JourneyRecord, UserProfile, SupportedLanguage } from '../types/index.ts';
 
 const DB_NAME = 'first_1000_days_db';
 const DB_VERSION = 1;
@@ -245,6 +245,225 @@ class IndexedDbService {
     downloadAnchor.click();
     downloadAnchor.remove();
   }
+
+  // Validação estrita de backup JSON antes de qualquer gravação
+  public validateBackupJson(rawText: string): BackupValidationResult {
+    const trimmed = rawText.trim();
+    if (!trimmed) {
+      return { valid: false, recordCount: 0, errorKey: 'emptyFile', errorMessage: 'O arquivo está vazio.' };
+    }
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch {
+      return { valid: false, recordCount: 0, errorKey: 'invalidJson', errorMessage: 'Arquivo JSON inválido ou corrompido.' };
+    }
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: 'Estrutura de dados raiz inválida.' };
+    }
+
+    if (parsed.schemaVersion !== '1.0') {
+      return {
+        valid: false,
+        recordCount: 0,
+        errorKey: 'unsupportedVersion',
+        errorMessage: `Versão de esquema "${parsed.schemaVersion || 'desconhecida'}" incompatível (esperado: 1.0).`
+      };
+    }
+
+    if (!Array.isArray(parsed.records)) {
+      return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: 'Campo "records" deve ser uma lista.' };
+    }
+
+    if (parsed.records.length === 0) {
+      return {
+        valid: false,
+        recordCount: 0,
+        errorKey: 'emptyFile',
+        errorMessage: 'O arquivo de backup não contém nenhum registro para restauração.'
+      };
+    }
+
+    const validRecords: JourneyRecord[] = [];
+    const seenIds = new Set<string>();
+    const subjects = { baby: 0, mom: 0, memory: 0 };
+    let minDate = '';
+    let maxDate = '';
+
+    for (let i = 0; i < parsed.records.length; i++) {
+      const rec = parsed.records[i];
+      if (!rec || typeof rec !== 'object') {
+        return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: `Registro na posição ${i + 1} inválido.` };
+      }
+
+      if (typeof rec.id !== 'string' || !rec.id.trim()) {
+        return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: `Registro ${i + 1} sem ID válido.` };
+      }
+
+      const cleanId = rec.id.trim();
+      if (seenIds.has(cleanId)) {
+        // Ignora duplicata interna preservando o primeiro
+        continue;
+      }
+      seenIds.add(cleanId);
+
+      if (!['baby', 'mom', 'memory'].includes(rec.subject)) {
+        return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: `Registro ${i + 1} com categoria inválida ("${rec.subject}").` };
+      }
+
+      if (!Array.isArray(rec.tags) || !rec.tags.every((t: any) => typeof t === 'string')) {
+        return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: `Registro ${i + 1} com tags inválidas.` };
+      }
+
+      if (typeof rec.eventDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(rec.eventDate)) {
+        return { valid: false, recordCount: 0, errorKey: 'corruptedRecord', errorMessage: `Registro ${i + 1} com data inválida (esperado YYYY-MM-DD).` };
+      }
+
+      const dateLabel = typeof rec.dateLabel === 'string' && rec.dateLabel.trim() ? rec.dateLabel.trim() : rec.eventDate;
+      const timestamp = typeof rec.timestamp === 'string' && rec.timestamp.trim() ? rec.timestamp.trim() : new Date().toISOString();
+
+      subjects[rec.subject as 'baby' | 'mom' | 'memory']++;
+
+      if (!minDate || rec.eventDate < minDate) minDate = rec.eventDate;
+      if (!maxDate || rec.eventDate > maxDate) maxDate = rec.eventDate;
+
+      validRecords.push({
+        id: cleanId,
+        subject: rec.subject,
+        tags: rec.tags,
+        note: typeof rec.note === 'string' ? rec.note : '',
+        sourceActivityTitle: typeof rec.sourceActivityTitle === 'string' ? rec.sourceActivityTitle : undefined,
+        contentId: typeof rec.contentId === 'string' ? rec.contentId : undefined,
+        timestamp,
+        eventDate: rec.eventDate,
+        dateLabel
+      });
+    }
+
+    return {
+      valid: true,
+      version: parsed.schemaVersion,
+      recordCount: validRecords.length,
+      dateRange: validRecords.length > 0 ? { min: minDate, max: maxDate } : undefined,
+      subjectCounts: subjects,
+      records: validRecords
+    };
+  }
+
+  // Restauração atômica com Mesclagem (Adicionar sem duplicar IDs existentes)
+  public async restoreBackupMerge(recordsToImport: JourneyRecord[]): Promise<RestoreResult> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const getAllKeysReq = store.getAllKeys();
+
+      getAllKeysReq.onerror = () => {
+        const err = getAllKeysReq.error || new Error('Erro ao consultar chaves existentes no IndexedDB');
+        try { tx.abort(); } catch (_) {}
+        reject(err);
+      };
+
+      getAllKeysReq.onsuccess = () => {
+        const existingKeys = new Set((getAllKeysReq.result as string[]).map(String));
+        let importedCount = 0;
+        let skippedCount = 0;
+
+        for (const rec of recordsToImport) {
+          if (existingKeys.has(rec.id)) {
+            skippedCount++;
+          } else {
+            store.add(rec);
+            existingKeys.add(rec.id);
+            importedCount++;
+          }
+        }
+
+        tx.oncomplete = () => {
+          resolve({
+            success: true,
+            importedCount,
+            skippedCount,
+            totalInDb: existingKeys.size,
+            mode: 'merge'
+          });
+        };
+
+        tx.onerror = () => {
+          reject(tx.error || new Error('Erro na transação de mesclagem do backup'));
+        };
+
+        tx.onabort = () => {
+          reject(new Error('Transação de mesclagem abortada. Nenhum dado foi alterado.'));
+        };
+      };
+    });
+  }
+
+  // Restauração atômica com Substituição Integral (Sobrescrever histórico)
+  public async restoreBackupReplace(recordsToImport: JourneyRecord[]): Promise<RestoreResult> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+
+      const clearReq = store.clear();
+
+      clearReq.onerror = () => {
+        const err = clearReq.error || new Error('Erro ao limpar a base antes da substituição');
+        try { tx.abort(); } catch (_) {}
+        reject(err);
+      };
+
+      clearReq.onsuccess = () => {
+        let importedCount = 0;
+        for (const rec of recordsToImport) {
+          store.add(rec);
+          importedCount++;
+        }
+
+        tx.oncomplete = () => {
+          resolve({
+            success: true,
+            importedCount,
+            skippedCount: 0,
+            totalInDb: importedCount,
+            mode: 'replace'
+          });
+        };
+
+        tx.onerror = () => {
+          reject(tx.error || new Error('Erro na transação de substituição do backup'));
+        };
+
+        tx.onabort = () => {
+          reject(new Error('Transação de substituição abortada. O estado anterior foi preservado.'));
+        };
+      };
+    });
+  }
+}
+
+export interface BackupValidationResult {
+  valid: boolean;
+  version?: string;
+  recordCount: number;
+  dateRange?: { min: string; max: string };
+  subjectCounts?: { baby: number; mom: number; memory: number };
+  records?: JourneyRecord[];
+  errorKey?: 'invalidJson' | 'unsupportedVersion' | 'corruptedRecord' | 'emptyFile';
+  errorMessage?: string;
+}
+
+export interface RestoreResult {
+  success: boolean;
+  importedCount: number;
+  skippedCount: number;
+  totalInDb: number;
+  mode: 'merge' | 'replace';
+  errorMessage?: string;
 }
 
 export const indexedDbService = new IndexedDbService();
